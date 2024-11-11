@@ -34,7 +34,6 @@ public class IndirizzoService {
         Cliente cliente = clienteRepository.findById(dto.clienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
 
-
         Comune comune = comuneRepository.findById(dto.comuneId())
                 .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
 
@@ -73,7 +72,7 @@ public class IndirizzoService {
         Comune comune = comuneRepository.findById(dto.comuneId())
                 .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
         indirizzo.setComune(comune);
-        
+
         return indirizzoRepository.save(indirizzo);
     }
 

@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public record IndirizzoDTO(
 
-        
+
         @NotEmpty(message = "La via è obbligatoria!")
         @Size(min = 3, max = 50, message = "La via deve contenere dai 3 ai 50 caratteri")
         String via,
@@ -26,7 +26,7 @@ public record IndirizzoDTO(
         String localita,
 
         @NotNull(message = "Il cliente è obbligatorio!")
-        UUID cliente,
+        UUID clienteId,
 
         @NotNull(message = "Il comune è obbligatorio!")
         UUID comuneId) {

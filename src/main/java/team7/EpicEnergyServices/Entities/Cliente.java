@@ -28,6 +28,7 @@ public class Cliente {
     private String partita_iva;
     private String email;
 
+    @Setter(AccessLevel.NONE)
     private LocalDate dataInserimento;
     private LocalDate dataUltimoContatto;
     private BigDecimal fatturatoAnnuale;

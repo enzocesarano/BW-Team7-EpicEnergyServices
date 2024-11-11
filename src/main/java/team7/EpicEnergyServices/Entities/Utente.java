@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import team7.EpicEnergyServices.Entities.Enums.TipoUtente;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,6 +30,9 @@ public class Utente {
 
     @Enumerated(EnumType.STRING)
     private TipoUtente tipoUtente;
+
+    @OneToMany(mappedBy = "id_cliente")
+    private List<Cliente> clienti;
 
     public Utente(String username, String email, String password, String nome, String cognome) {
         this.username = username;

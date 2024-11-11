@@ -1,5 +1,6 @@
 package team7.EpicEnergyServices.Entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,11 +39,20 @@ public class Cliente {
     private String telefonoContatto;
     private String logoAziendale;
 
-    @OneToMany
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Indirizzo sedeLegale;
 
-    @OneToMany
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Indirizzo> sedeOperativa;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private List<Fattura> fatture;
+
+    @ManyToOne
+    @JoinColumn(name = "id_utente")
+    private Utente utente;
 
     @Enumerated(EnumType.STRING)
     private TipoCliente tipoCliente;

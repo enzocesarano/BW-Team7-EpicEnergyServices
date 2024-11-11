@@ -25,9 +25,10 @@ public class Comune {
     private String denominazione;
 
     @ManyToOne
+    @JoinColumn(name = "id_provincia")
     private Provincia provincia;
 
-    @OneToMany
+    @OneToMany(mappedBy = "comune")
     private List<Indirizzo> indirizzi;
 
     public Comune(String progressivoComune, String denominazione, Provincia provincia) {

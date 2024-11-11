@@ -28,6 +28,7 @@ public class Fattura {
     private StatoFattura statoFattura;
 
     @ManyToOne
+    @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
     public Fattura(double importo, Cliente cliente) {

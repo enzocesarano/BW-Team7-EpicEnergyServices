@@ -22,7 +22,7 @@ public class Indirizzo {
 
     private String via;
     private String civico;
-    private String località;
+    private String localita;
     private String cap;
 
     @ManyToOne
@@ -37,7 +37,7 @@ public class Indirizzo {
     public Indirizzo(String via, String civico, String località, String cap, Comune comune, Cliente cliente) {
         this.via = via;
         this.civico = civico;
-        this.località = località;
+        this.localita = localita;
         this.cap = cap;
         this.comune = comune;
         this.cliente = cliente;

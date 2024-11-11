@@ -47,4 +47,10 @@ public class IndirizzoController {
         Indirizzo updatedIndirizzo = indirizzoService.updateIndirizzo(id, indirizzoDTO);
         return ResponseEntity.ok(updatedIndirizzo);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteIndirizzo(@PathVariable UUID id) {
+        indirizzoService.deleteIndirizzo(id);
+        return ResponseEntity.noContent().build();
+    }
 }

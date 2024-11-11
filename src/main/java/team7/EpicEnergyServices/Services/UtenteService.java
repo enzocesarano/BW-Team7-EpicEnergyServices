@@ -40,7 +40,7 @@ public class UtenteService {
         return this.utenteRepository.save(newUtente);
     }
 
-    public Page<Utente> findAll(int page, int size, String sortBy){
+    public Page<Utente> findAll(int page, int size, String sortBy) {
         if (size > 100) size = 100;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return this.utenteRepository.findAll(pageable);
@@ -73,11 +73,11 @@ public class UtenteService {
         this.utenteRepository.delete(userFound);
     }
 
-    public Utente finByEmail(String email){
-        return this.utenteRepository.findByEmail(email).orElseThrow(()-> new NotFoundException("l'untente con la mail " + email + " non è stato trovato"));
+    public Utente finByEmail(String email) {
+        return this.utenteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("l'untente con la mail " + email + " non è stato trovato"));
     }
 
-        public Utente uploadAvatar (UUID utenteId, MultipartFile file){
+    public Utente uploadAvatar(UUID utenteId, MultipartFile file) {
 
         if (file.isEmpty()) {
             throw new BadRequestException("Il file dell'immagine non può essere vuoto");
@@ -86,7 +86,7 @@ public class UtenteService {
         String url = null;
         try {
             url = (String) cloudinaryUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap()).get("url");
-        } catch (IOException e ) {
+        } catch (IOException e) {
             throw new BadRequestException("errore nel caricamento dell'immagine");
         }
 

@@ -18,7 +18,5 @@ public record UtenteDTO(
         @Email(message = "L'email inserita non è un'email valida")
         String email,
         @NotEmpty(message = "password obbligatoria")
-        String password,
-        @NotEmpty(message = "password obbligatoria")
-        String avatar) {
+        String password) {
 }

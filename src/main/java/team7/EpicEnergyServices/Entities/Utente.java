@@ -5,8 +5,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import team7.EpicEnergyServices.Entities.Enums.TipoUtente;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +19,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "utenti")
-public class Utente {
+public class Utente implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
@@ -41,5 +45,10 @@ public class Utente {
         this.nome = nome;
         this.cognome = cognome;
         this.tipoUtente = TipoUtente.USER;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.tipoUtente.name()));
     }
 }

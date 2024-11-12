@@ -53,7 +53,6 @@ public class Cliente {
 
     @ManyToOne
     @JoinColumn(name = "id_utente")
-    @JsonManagedReference
     private Utente utente;
 
     @Enumerated(EnumType.STRING)

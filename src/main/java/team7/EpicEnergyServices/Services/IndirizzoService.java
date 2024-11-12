@@ -23,27 +23,27 @@ public class IndirizzoService {
     @Autowired
     private IndirizzoRepository indirizzoRepository;
 
-    public Indirizzo createIndirizzo(IndirizzoDTO indirizzoDTO) {
-        Indirizzo indirizzo = convertDtoToEntity(indirizzoDTO);
-        return indirizzoRepository.save(indirizzo);
-    }
+    public Indirizzo createIndirizzo(IndirizzoDTO indirizzo) {
+        Comune comune = comuneRepository.findById(indirizzo.comune())
+                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + indirizzo.comune()));
 
-    private Indirizzo convertDtoToEntity(IndirizzoDTO dto) {
-
-//        Cliente cliente = clienteRepository.findById(dto.clienteId())
-//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
-
-        Comune comune = comuneRepository.findById(dto.comuneId().getId_comune())
-                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
-
-        return new Indirizzo(
-                dto.via(),
-                dto.civico(),
-                dto.localita(),
-                dto.cap(),
+        Indirizzo indirizzo1 = new Indirizzo(
+                indirizzo.via(),
+                indirizzo.civico(),
+                indirizzo.localita(),
+                indirizzo.cap(),
                 comune
         );
+        return indirizzoRepository.save(indirizzo1);
     }
+
+//    private Indirizzo convertDtoToEntity(IndirizzoDTO dto) {
+//
+//        Cliente cliente = clienteRepository.findById(dto.clienteId())
+//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
+//
+//
+//    }
 
 
     public List<Indirizzo> getAllIndirizzi() {
@@ -67,8 +67,8 @@ public class IndirizzoService {
 //                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
 //        indirizzo.setCliente(cliente);
 
-        Comune comune = comuneRepository.findById(dto.comuneId().getId_comune())
-                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
+        Comune comune = comuneRepository.findById(dto.comune())
+                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comune()));
         indirizzo.setComune(comune);
 
         return indirizzoRepository.save(indirizzo);

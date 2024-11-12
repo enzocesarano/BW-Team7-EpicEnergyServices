@@ -1,8 +1,8 @@
 package team7.EpicEnergyServices.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import team7.EpicEnergyServices.Entities.Enums.TipoCliente;
-import team7.EpicEnergyServices.Entities.Indirizzo;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -52,11 +52,13 @@ public record ClienteDTO(
         @Pattern(regexp = "\\+?\\d{7,15}", message = "Inserisci un numero di telefono di contatto valido.")
         String telefonoContatto,
 
+        @JsonFormat(shape = JsonFormat.Shape.OBJECT)
         @NotNull(message = "La sede legale è obbligatoria.")
-        Indirizzo sedeLegale,
+        IndirizzoDTO sedeLegale,
 
+        @JsonFormat(shape = JsonFormat.Shape.OBJECT)
         @NotEmpty(message = "La lista delle sedi operative non può essere vuota.")
-        List<Indirizzo> sedeOperativa,
+        List<IndirizzoDTO> sedeOperativa,  // La lista di Indirizzo
 
         @NotNull(message = "Il tipo cliente è obbligatorio.")
         TipoCliente tipoCliente) {

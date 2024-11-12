@@ -1,6 +1,7 @@
 package team7.EpicEnergyServices.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,8 +33,10 @@ public class Indirizzo {
 
     @ManyToOne
     @JoinColumn(name = "id_comune")
+    @JsonBackReference
     private Comune comune;
 
+    @JsonCreator
     public Indirizzo(String via, String civico, String località, String cap, Comune comune) {
         this.via = via;
         this.civico = civico;

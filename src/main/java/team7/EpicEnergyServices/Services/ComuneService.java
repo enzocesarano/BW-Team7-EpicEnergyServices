@@ -5,11 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Comune;
+import team7.EpicEnergyServices.Exceptions.NotFoundException;
 import team7.EpicEnergyServices.Repositories.ComuneRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ComuneService {
@@ -39,6 +41,11 @@ public class ComuneService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Comune findById(UUID id_comune) {
+        return comuneRepository.findById(id_comune)
+                .orElseThrow(() -> new NotFoundException("Cliente con ID " + id_comune + " non trovato"));
     }
 
 }

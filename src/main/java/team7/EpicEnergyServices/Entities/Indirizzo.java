@@ -34,12 +34,11 @@ public class Indirizzo {
     @JoinColumn(name = "id_comune")
     private Comune comune;
 
-    public Indirizzo(String via, String civico, String località, String cap, Comune comune, Cliente cliente) {
+    public Indirizzo(String via, String civico, String località, String cap, Comune comune) {
         this.via = via;
         this.civico = civico;
         this.localita = localita;
         this.cap = cap;
         this.comune = comune;
-        this.cliente = cliente;
     }
 }

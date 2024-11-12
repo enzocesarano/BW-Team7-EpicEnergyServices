@@ -10,15 +10,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Cliente;
+import team7.EpicEnergyServices.Entities.Indirizzo;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
 import team7.EpicEnergyServices.Exceptions.NotFoundException;
 import team7.EpicEnergyServices.Exceptions.UnauthorizedException;
 import team7.EpicEnergyServices.Repositories.ClienteRepository;
+import team7.EpicEnergyServices.Repositories.IndirizzoRepository;
 import team7.EpicEnergyServices.dto.ClienteDTO;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class ClienteService {
@@ -28,6 +32,12 @@ public class ClienteService {
 
     @Autowired
     private Cloudinary cloudinaryUploader;
+
+    @Autowired
+    private IndirizzoService indirizzoService;
+
+    @Autowired
+    private IndirizzoRepository indirizzoRepository;
 
     public Page<Cliente> findAll(int page, int size, String sortBy) {
         if (size > 15) size = 15;
@@ -51,6 +61,26 @@ public class ClienteService {
             throw new BadRequestException("La mail è già in uso");
         }
 
+        Indirizzo newIndirizzo = new Indirizzo(payload.sedeLegale().getVia(),
+                payload.sedeLegale().getCivico(),
+                payload.sedeLegale().getCap(),
+                payload.sedeLegale().getLocalita(),
+                payload.sedeLegale().getComune());
+        indirizzoRepository.save(newIndirizzo);
+
+        List<Indirizzo> sedeOperativaList = payload.sedeOperativa().stream()
+                .map(sedeOperativaDTO -> {
+                    Indirizzo sedeOperativa = new Indirizzo(
+                            sedeOperativaDTO.getVia(),
+                            sedeOperativaDTO.getCivico(),
+                            sedeOperativaDTO.getCap(),
+                            sedeOperativaDTO.getLocalita(),
+                            sedeOperativaDTO.getComune()
+                    );
+                    return indirizzoRepository.save(sedeOperativa);
+                })
+                .collect(Collectors.toList());
+
         Cliente newCliente = new Cliente(
                 payload.ragione_sociale(),
                 payload.partita_iva(),
@@ -61,8 +91,8 @@ public class ClienteService {
                 payload.nomeContatto(),
                 payload.cognomeContatto(),
                 payload.telefonoContatto(),
-                payload.sedeLegale(),
-                payload.sedeOperativa()
+                newIndirizzo,
+                sedeOperativaList
         );
         newCliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
         newCliente.setDataUltimoContatto(payload.dataUltimoContatto());
@@ -79,6 +109,14 @@ public class ClienteService {
             throw new BadRequestException("La mail è già in uso");
         }
 
+        Indirizzo indirizzo = this.indirizzoService.getIndirizzoById(payload.sedeLegale().getId_indirizzo())
+                .orElseThrow(() -> new NotFoundException("L'indirizzo con " + payload.sedeLegale() + " non è stato trovato!"));
+
+        List<Indirizzo> sedeOperativaList = payload.sedeOperativa().stream()
+                .map(id -> this.indirizzoService.getIndirizzoById(id.getId_indirizzo())
+                        .orElseThrow(() -> new NotFoundException("L'indirizzo con ID " + id.getId_indirizzo() + " non è stato trovato!"))
+                ).toList();
+
         cliente.setRagione_sociale(payload.ragione_sociale());
         cliente.setPartita_iva(payload.partita_iva());
         cliente.setEmail(payload.email());
@@ -88,8 +126,8 @@ public class ClienteService {
         cliente.setNomeContatto(payload.nomeContatto());
         cliente.setCognomeContatto(payload.cognomeContatto());
         cliente.setTelefonoContatto(payload.telefonoContatto());
-        cliente.setSedeLegale(payload.sedeLegale());
-        cliente.setSedeOperativa(payload.sedeOperativa());
+        cliente.setSedeLegale(indirizzo);
+        cliente.setSedeOperativa(sedeOperativaList);
         cliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
         cliente.setDataUltimoContatto(payload.dataUltimoContatto());
         cliente.setTipoCliente(payload.tipoCliente());

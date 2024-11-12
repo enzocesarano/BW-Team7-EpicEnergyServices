@@ -59,6 +59,5 @@ public record ClienteDTO(
         List<Indirizzo> sedeOperativa,
 
         @NotNull(message = "Il tipo cliente è obbligatorio.")
-        @Pattern(regexp = "PA|SAS|SPA|SRL", message = "Il tipo cliente deve essere uno tra: PA, SAS, SPA, SRL.")
         TipoCliente tipoCliente) {
 }

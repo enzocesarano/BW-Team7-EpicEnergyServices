@@ -2,7 +2,6 @@ package team7.EpicEnergyServices.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Comune;
 import team7.EpicEnergyServices.Entities.Indirizzo;
 import team7.EpicEnergyServices.Repositories.ClienteRepository;
@@ -31,10 +30,10 @@ public class IndirizzoService {
 
     private Indirizzo convertDtoToEntity(IndirizzoDTO dto) {
 
-        Cliente cliente = clienteRepository.findById(dto.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
+//        Cliente cliente = clienteRepository.findById(dto.clienteId())
+//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
 
-        Comune comune = comuneRepository.findById(dto.comuneId())
+        Comune comune = comuneRepository.findById(dto.comuneId().getId_comune())
                 .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
 
         return new Indirizzo(
@@ -42,8 +41,7 @@ public class IndirizzoService {
                 dto.civico(),
                 dto.localita(),
                 dto.cap(),
-                comune,
-                cliente
+                comune
         );
     }
 
@@ -65,11 +63,11 @@ public class IndirizzoService {
         indirizzo.setLocalita(dto.localita());
         indirizzo.setCap(dto.cap());
 
-        Cliente cliente = clienteRepository.findById(dto.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
-        indirizzo.setCliente(cliente);
+//        Cliente cliente = clienteRepository.findById(dto.clienteId())
+//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
+//        indirizzo.setCliente(cliente);
 
-        Comune comune = comuneRepository.findById(dto.comuneId())
+        Comune comune = comuneRepository.findById(dto.comuneId().getId_comune())
                 .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
         indirizzo.setComune(comune);
 

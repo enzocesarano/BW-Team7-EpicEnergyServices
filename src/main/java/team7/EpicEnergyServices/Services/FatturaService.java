@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import team7.EpicEnergyServices.Entities.Cliente;
+import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
 import team7.EpicEnergyServices.Entities.Fattura;
 import team7.EpicEnergyServices.Exceptions.NotFoundException;
 import team7.EpicEnergyServices.Repositories.ClienteRepository;
@@ -58,17 +59,27 @@ public class FatturaService {
         return this.fR.findByCliente(pageable, clienteID);
     }
 
-    public Page<Fattura> findbyData(int page, int size, String sortBy, LocalDate data) {
-        if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return this.fR.findByData(pageable, data);
+    public Page<Fattura> findFattureByStatoFattura(StatoFattura statoFattura, int page, int size, String sortBy) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
+        return fR.findByStatoFattura(statoFattura, pageRequest);
     }
 
-    public Page<Fattura> findbyRange(int page, int size, String sortBy, double minimo, double massimo) {
+    public Page<Fattura> findbyDataFattura(int page, int size, String sortBy, LocalDate data) {
         if (size > 100) size = 100;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return this.fR.findByImporto(pageable, minimo, massimo);
+        return this.fR.findByDataFattura(pageable, data);
     }
 
+    public Page<Fattura> findByImporto(int page, int size, String sortBy, double minimo, double massimo) {
+        if (size > 100) size = 100;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        return this.fR.findByImportoBetween(pageable, minimo, massimo);
+    }
+
+
+    public void findByIdAndDelete(UUID fatturaId) {
+        Fattura found = this.findById(fatturaId);
+        this.fR.delete(found);
+    }
 
 }

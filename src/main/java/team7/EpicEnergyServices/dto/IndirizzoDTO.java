@@ -3,8 +3,7 @@ package team7.EpicEnergyServices.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
-import java.util.UUID;
+import team7.EpicEnergyServices.Entities.Comune;
 
 public record IndirizzoDTO(
 
@@ -25,9 +24,6 @@ public record IndirizzoDTO(
         @Size(min = 3, max = 50, message = "La localita deve contenere tra i 3 e i 50 caratteri")
         String localita,
 
-        @NotNull(message = "Il cliente è obbligatorio!")
-        UUID clienteId,
-
         @NotNull(message = "Il comune è obbligatorio!")
-        UUID comuneId) {
+        Comune comuneId) {
 }

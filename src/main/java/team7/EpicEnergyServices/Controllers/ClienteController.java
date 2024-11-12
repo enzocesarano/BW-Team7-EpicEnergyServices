@@ -3,6 +3,7 @@ package team7.EpicEnergyServices.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -39,7 +40,7 @@ public class ClienteController {
         return clienteService.findById(id_cliente);
     }
 
-    @PostMapping("/me/clienti")
+    @PostMapping(value = "/me/clienti", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente createCliente(
             @RequestBody @Validated ClienteDTO payload,

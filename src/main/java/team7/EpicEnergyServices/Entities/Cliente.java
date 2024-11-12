@@ -1,5 +1,6 @@
 package team7.EpicEnergyServices.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -18,13 +19,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "clienti")
+@JsonIgnoreProperties({"id_cliente", "fatturatoAnnuale", "utente", "fatture"})
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Setter(AccessLevel.NONE)
     private UUID id_cliente;
 
-    private String ragione_sociale;
+    @Column(name = "ragione_sociale")
+    private String ragioneSociale;
     private String partita_iva;
     private String email;
 
@@ -40,10 +43,6 @@ public class Cliente {
     private String telefonoContatto;
     private String logoAziendale;
 
-    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL)
-    @JsonManagedReference
-    private Indirizzo sedeLegale;
-
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Indirizzo> sedeOperativa;
@@ -58,8 +57,8 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private TipoCliente tipoCliente;
 
-    public Cliente(String ragione_sociale, String partita_iva, String email, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, Indirizzo sedeLegale, List<Indirizzo> sedeOperativa) {
-        this.ragione_sociale = ragione_sociale;
+    public Cliente(String ragioneSociale, String partita_iva, String email, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, List<Indirizzo> sedeOperativa) {
+        this.ragioneSociale = ragioneSociale;
         this.partita_iva = partita_iva;
         this.email = email;
         this.pec = pec;
@@ -68,7 +67,7 @@ public class Cliente {
         this.nomeContatto = nomeContatto;
         this.cognomeContatto = cognomeContatto;
         this.telefonoContatto = telefonoContatto;
-        this.sedeLegale = sedeLegale;
         this.sedeOperativa = sedeOperativa;
+        this.dataInserimento = LocalDate.now();
     }
 }

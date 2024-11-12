@@ -49,7 +49,7 @@ public class ClienteService {
         return clienteRepository.findAll(pageable);
     }
 
-    public Page<Cliente> findAllByUser(int page, int size, String sortBy, Utente currentAuthenticatedUtente) {
+    public Page<Cliente> findAllByUtente(int page, int size, String sortBy, Utente currentAuthenticatedUtente) {
         if (size > 15) size = 15;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return clienteRepository.findAllByUtente(currentAuthenticatedUtente, pageable);
@@ -65,43 +65,8 @@ public class ClienteService {
             throw new BadRequestException("La mail è già in uso");
         }
 
-        Comune comuneSedeLegale = this.comuneService.findById(payload.sedeLegale().comune());
-
-        Indirizzo newIndirizzo = new Indirizzo(
-                payload.sedeLegale().via(),
-                payload.sedeLegale().civico(),
-                payload.sedeLegale().localita(),
-                payload.sedeLegale().cap(),
-                comuneSedeLegale
-        );
-        indirizzoRepository.save(newIndirizzo);
-
-        List<Indirizzo> sedeOperativaList = payload.sedeOperativa().stream()
-                .map(sede -> {
-                    if (sede.comune() == null) {
-                        throw new BadRequestException("Comune non fornito per la sede operativa");
-                    }
-
-                    // Recupera il comune per ogni sede operativa utilizzando l'ID
-                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
-
-                    // Crea l'indirizzo operativo
-                    Indirizzo indirizzoOperativo = new Indirizzo(
-                            sede.via(),
-                            sede.civico(),
-                            sede.localita(),
-                            sede.cap(),
-                            comuneOperativo
-                    );
-
-                    indirizzoRepository.save(indirizzoOperativo);
-
-                    return indirizzoOperativo;
-                })
-                .collect(Collectors.toList());
-
         Cliente newCliente = new Cliente(
-                payload.ragione_sociale(),
+                payload.ragioneSociale(),
                 payload.partita_iva(),
                 payload.email(),
                 payload.pec(),
@@ -110,34 +75,45 @@ public class ClienteService {
                 payload.nomeContatto(),
                 payload.cognomeContatto(),
                 payload.telefonoContatto(),
-                newIndirizzo,
-                sedeOperativaList
+                null
         );
 
-        newCliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
         newCliente.setDataUltimoContatto(payload.dataUltimoContatto());
         newCliente.setTipoCliente(payload.tipoCliente());
         newCliente.setUtente(currentAuthenticatedUtente);
-
+        newCliente.setLogoAziendale("https://ui-avatars.com/api/?name=" + payload.ragioneSociale().replace(" ", ""));
+        clienteRepository.save(newCliente);
+        List<Indirizzo> sedeOperativaList = payload.sede().stream()
+                .map(sede -> {
+                    if (sede.comune() == null) {
+                        throw new BadRequestException("Comune non fornito per la sede operativa");
+                    }
+                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+                    Indirizzo indirizzoOperativo = new Indirizzo(
+                            sede.via(),
+                            sede.civico(),
+                            sede.localita(),
+                            sede.cap(),
+                            comuneOperativo,
+                            sede.sede()
+                    );
+                    indirizzoOperativo.setCliente(newCliente);
+                    indirizzoRepository.save(indirizzoOperativo);
+                    return indirizzoOperativo;
+                })
+                .collect(Collectors.toList());
+        newCliente.setSedeOperativa(sedeOperativaList);
         return clienteRepository.save(newCliente);
     }
 
-    public Cliente findByIdAndUpdate(UUID id_cliente, ClienteDTO payload) {
-        Cliente cliente = this.findById(id_cliente);
 
+    public Cliente findByIdAndUpdate(UUID id_cliente, ClienteDTO payload, Utente currentAuthenticatedUtente) {
+        Cliente cliente = this.findById(id_cliente);
         if (!cliente.getEmail().equals(payload.email()) && clienteRepository.existsByEmail(payload.email())) {
             throw new BadRequestException("La mail è già in uso");
         }
 
-        Indirizzo indirizzo = this.indirizzoService.getIndirizzoById(payload.sedeLegale().comune())
-                .orElseThrow(() -> new NotFoundException("L'indirizzo con " + payload.sedeLegale() + " non è stato trovato!"));
-
-        List<Indirizzo> sedeOperativaList = payload.sedeOperativa().stream()
-                .map(id -> this.indirizzoService.getIndirizzoById(id.comune())
-                        .orElseThrow(() -> new NotFoundException("L'indirizzo con ID " + id.comune() + " non è stato trovato!"))
-                ).toList();
-
-        cliente.setRagione_sociale(payload.ragione_sociale());
+        cliente.setRagioneSociale(payload.ragioneSociale());
         cliente.setPartita_iva(payload.partita_iva());
         cliente.setEmail(payload.email());
         cliente.setPec(payload.pec());
@@ -146,14 +122,36 @@ public class ClienteService {
         cliente.setNomeContatto(payload.nomeContatto());
         cliente.setCognomeContatto(payload.cognomeContatto());
         cliente.setTelefonoContatto(payload.telefonoContatto());
-        cliente.setSedeLegale(indirizzo);
-        cliente.setSedeOperativa(sedeOperativaList);
-        cliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
         cliente.setDataUltimoContatto(payload.dataUltimoContatto());
         cliente.setTipoCliente(payload.tipoCliente());
+        cliente.setUtente(currentAuthenticatedUtente);
+        cliente.setLogoAziendale("https://ui-avatars.com/api/?name=" + payload.ragioneSociale().replace(" ", ""));
 
+        List<Indirizzo> sediList = payload.sede().stream()
+                .map(sede -> {
+                    if (sede.comune() == null) {
+                        throw new BadRequestException("Comune non fornito per la sede");
+                    }
+
+                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+
+                    Indirizzo indirizzo = new Indirizzo(
+                            sede.via(),
+                            sede.civico(),
+                            sede.localita(),
+                            sede.cap(),
+                            comuneOperativo,
+                            sede.sede()
+                    );
+                    indirizzo.setCliente(cliente);
+                    indirizzoRepository.save(indirizzo);
+                    return indirizzo;
+                })
+                .collect(Collectors.toList());
+        cliente.setSedeOperativa(sediList);
         return clienteRepository.save(cliente);
     }
+
 
     public void deleteCliente(UUID id_cliente) {
         Cliente cliente = this.findById(id_cliente);

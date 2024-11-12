@@ -3,6 +3,7 @@ package team7.EpicEnergyServices.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import team7.EpicEnergyServices.Entities.Enums.TipoIndirizzo;
 
 import java.util.UUID;
 
@@ -26,5 +27,10 @@ public record IndirizzoDTO(
         String cap,
 
         @NotNull(message = "Il comune è obbligatorio!")
-        UUID comune) {
+        UUID comune,
+
+        @NotNull(message = "Il tipo di sede è obbligatorio")
+        TipoIndirizzo sede
+) {
+
 }

@@ -30,7 +30,7 @@ public class ClienteController {
     public Page<Cliente> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ragione_sociale") String sortBy) {
+            @RequestParam(defaultValue = "ragioneSociale") String sortBy) {
         return clienteService.findAll(page, size, sortBy);
     }
 
@@ -53,28 +53,29 @@ public class ClienteController {
         return clienteService.saveCliente(payload, currentAuthenticatedUtente);
     }
 
-    @GetMapping("/me/clienti")
+    @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public Page<Cliente> findAllByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ragione_sociale") String sortBy,
+            @RequestParam(defaultValue = "ragioneSociale") String sortBy,
             @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
-        return clienteService.findAllByUser(page, size, sortBy, currentAuthenticatedUtente);
+        return clienteService.findAllByUtente(page, size, sortBy, currentAuthenticatedUtente);
     }
 
-    @PutMapping("/{id_cliente}")
+    @PutMapping("/me/clienti/{id_cliente}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('USER')")
     public Cliente updateCliente(
             @PathVariable UUID id_cliente,
             @RequestBody @Validated ClienteDTO payload,
-            BindingResult validationResult) {
+            BindingResult validationResult,
+            @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         if (validationResult.hasErrors()) {
             validationResult.getAllErrors().forEach(System.out::println);
             throw new BadRequestException("Errore nei dati forniti!");
         }
-        return clienteService.findByIdAndUpdate(id_cliente, payload);
+        return clienteService.findByIdAndUpdate(id_cliente, payload, currentAuthenticatedUtente);
     }
 
     @DeleteMapping("/{id_cliente}")

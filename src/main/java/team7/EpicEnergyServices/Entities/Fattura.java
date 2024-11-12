@@ -31,8 +31,11 @@ public class Fattura {
     @JoinColumn(name = "id_cliente")
     private Cliente cliente;
 
-    public Fattura(double importo, Cliente cliente) {
+    public Fattura(LocalDate dataFattura, double importo, StatoFattura statoFattura, Cliente cliente) {
+        this.dataFattura = dataFattura;
         this.importo = importo;
+        this.statoFattura = statoFattura;
         this.cliente = cliente;
     }
+
 }

@@ -37,7 +37,7 @@ public class Indirizzo {
     private Comune comune;
 
     @JsonCreator
-    public Indirizzo(String via, String civico, String località, String cap, Comune comune) {
+    public Indirizzo(String via, String civico, String localita, String cap, Comune comune) {
         this.via = via;
         this.civico = civico;
         this.localita = localita;

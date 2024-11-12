@@ -94,14 +94,12 @@ public class ClienteService {
                             comuneOperativo
                     );
 
-                    // Salva l'indirizzo operativo nel database
                     indirizzoRepository.save(indirizzoOperativo);
 
                     return indirizzoOperativo;
                 })
                 .collect(Collectors.toList());
 
-        // Crea il nuovo cliente e associa la sede legale e gli indirizzi operativi
         Cliente newCliente = new Cliente(
                 payload.ragione_sociale(),
                 payload.partita_iva(),
@@ -112,17 +110,15 @@ public class ClienteService {
                 payload.nomeContatto(),
                 payload.cognomeContatto(),
                 payload.telefonoContatto(),
-                newIndirizzo,  // Associa la sede legale
-                sedeOperativaList // Associa la lista degli indirizzi operativi
+                newIndirizzo,
+                sedeOperativaList
         );
 
-        // Imposta altri dati del cliente
         newCliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
         newCliente.setDataUltimoContatto(payload.dataUltimoContatto());
         newCliente.setTipoCliente(payload.tipoCliente());
         newCliente.setUtente(currentAuthenticatedUtente);
 
-        // Salva il cliente nel database
         return clienteRepository.save(newCliente);
     }
 

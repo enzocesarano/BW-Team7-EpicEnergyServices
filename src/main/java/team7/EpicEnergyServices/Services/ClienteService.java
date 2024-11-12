@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Cliente;
+import team7.EpicEnergyServices.Entities.Comune;
 import team7.EpicEnergyServices.Entities.Indirizzo;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
@@ -39,6 +40,9 @@ public class ClienteService {
     @Autowired
     private IndirizzoRepository indirizzoRepository;
 
+    @Autowired
+    private ComuneService comuneService;
+
     public Page<Cliente> findAll(int page, int size, String sortBy) {
         if (size > 15) size = 15;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
@@ -61,23 +65,38 @@ public class ClienteService {
             throw new BadRequestException("La mail è già in uso");
         }
 
-        Indirizzo newIndirizzo = new Indirizzo(payload.sedeLegale().getVia(),
-                payload.sedeLegale().getCivico(),
-                payload.sedeLegale().getCap(),
-                payload.sedeLegale().getLocalita(),
-                payload.sedeLegale().getComune());
+        Comune comuneSedeLegale = this.comuneService.findById(payload.sedeLegale().comune());
+
+        Indirizzo newIndirizzo = new Indirizzo(
+                payload.sedeLegale().via(),
+                payload.sedeLegale().civico(),
+                payload.sedeLegale().localita(),
+                payload.sedeLegale().cap(),
+                comuneSedeLegale
+        );
         indirizzoRepository.save(newIndirizzo);
 
         List<Indirizzo> sedeOperativaList = payload.sedeOperativa().stream()
-                .map(sedeOperativaDTO -> {
-                    Indirizzo sedeOperativa = new Indirizzo(
-                            sedeOperativaDTO.getVia(),
-                            sedeOperativaDTO.getCivico(),
-                            sedeOperativaDTO.getCap(),
-                            sedeOperativaDTO.getLocalita(),
-                            sedeOperativaDTO.getComune()
+                .map(sede -> {
+                    if (sede.comune() == null) {
+                        throw new BadRequestException("Comune non fornito per la sede operativa");
+                    }
+
+                    // Recupera il comune per ogni sede operativa utilizzando l'ID
+                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+
+                    // Crea l'indirizzo operativo
+                    Indirizzo indirizzoOperativo = new Indirizzo(
+                            sede.via(),
+                            sede.civico(),
+                            sede.localita(),
+                            sede.cap(),
+                            comuneOperativo
                     );
-                    return indirizzoRepository.save(sedeOperativa);
+
+                    indirizzoRepository.save(indirizzoOperativo);
+
+                    return indirizzoOperativo;
                 })
                 .collect(Collectors.toList());
 
@@ -94,6 +113,7 @@ public class ClienteService {
                 newIndirizzo,
                 sedeOperativaList
         );
+
         newCliente.setFatturatoAnnuale(payload.fatturatoAnnuale());
         newCliente.setDataUltimoContatto(payload.dataUltimoContatto());
         newCliente.setTipoCliente(payload.tipoCliente());
@@ -109,12 +129,12 @@ public class ClienteService {
             throw new BadRequestException("La mail è già in uso");
         }
 
-        Indirizzo indirizzo = this.indirizzoService.getIndirizzoById(payload.sedeLegale().getId_indirizzo())
+        Indirizzo indirizzo = this.indirizzoService.getIndirizzoById(payload.sedeLegale().comune())
                 .orElseThrow(() -> new NotFoundException("L'indirizzo con " + payload.sedeLegale() + " non è stato trovato!"));
 
         List<Indirizzo> sedeOperativaList = payload.sedeOperativa().stream()
-                .map(id -> this.indirizzoService.getIndirizzoById(id.getId_indirizzo())
-                        .orElseThrow(() -> new NotFoundException("L'indirizzo con ID " + id.getId_indirizzo() + " non è stato trovato!"))
+                .map(id -> this.indirizzoService.getIndirizzoById(id.comune())
+                        .orElseThrow(() -> new NotFoundException("L'indirizzo con ID " + id.comune() + " non è stato trovato!"))
                 ).toList();
 
         cliente.setRagione_sociale(payload.ragione_sociale());

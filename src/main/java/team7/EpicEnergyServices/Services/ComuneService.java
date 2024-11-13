@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Comune;
+import team7.EpicEnergyServices.Entities.Provincia;
 import team7.EpicEnergyServices.Exceptions.NotFoundException;
 import team7.EpicEnergyServices.Repositories.ComuneRepository;
 
@@ -43,7 +44,19 @@ public class ComuneService {
                 String codiceProvincia = dati[0].trim();
                 String progressivo = dati[1].trim();
                 String denominazione = dati[2].trim();
+                String provincia1 = dati[3].trim();
 
+
+                if (provincia1.matches("(?i).*valle d'aosta.*")) {
+                    provincia1 = "Aosta";
+                }
+
+                if (provincia1.matches("(?i).*Bolzano/Bozen.*")) {
+                    provincia1 = "Bolzano";
+                }
+
+
+                Provincia provincia = this.provinciaService.findByNome(provincia1);
 
                 if (!codiceProvincia.equals(codiceProvinciaCorrente)) {
                     codiceProvinciaCorrente = codiceProvincia;
@@ -60,6 +73,7 @@ public class ComuneService {
                 comune.setCodiceProvincia(codiceProvincia);
                 comune.setProgressivoComune(progressivo);
                 comune.setDenominazione(denominazione);
+                comune.setProvincia(provincia);
 
                 comuneRepository.save(comune);
             }

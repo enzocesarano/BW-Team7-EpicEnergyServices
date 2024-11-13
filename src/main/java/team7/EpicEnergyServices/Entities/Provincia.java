@@ -1,5 +1,6 @@
 package team7.EpicEnergyServices.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class Provincia {
     private String regione;
 
     @OneToMany(mappedBy = "provincia")
+    @JsonBackReference
     private List<Comune> comuni;
 
     public Provincia(String sigla, String nome, String regione) {

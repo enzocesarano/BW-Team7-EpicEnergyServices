@@ -38,14 +38,6 @@ public class IndirizzoService {
         return indirizzoRepository.save(indirizzo1);
     }
 
-//    private Indirizzo convertDtoToEntity(IndirizzoDTO dto) {
-//
-//        Cliente cliente = clienteRepository.findById(dto.clienteId())
-//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
-//
-//
-//    }
-
 
     public List<Indirizzo> getAllIndirizzi() {
         return indirizzoRepository.findAll();
@@ -63,10 +55,6 @@ public class IndirizzoService {
         indirizzo.setCivico(dto.civico());
         indirizzo.setLocalita(dto.localita());
         indirizzo.setCap(dto.cap());
-
-//        Cliente cliente = clienteRepository.findById(dto.clienteId())
-//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
-//        indirizzo.setCliente(cliente);
 
         Comune comune = comuneRepository.findById(dto.comune())
                 .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comune()));

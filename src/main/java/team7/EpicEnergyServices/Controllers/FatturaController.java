@@ -23,40 +23,36 @@ public class FatturaController {
     private FatturaService fatturaService;
 
     @GetMapping
-    public Page<Fattura> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-                                 @RequestParam(defaultValue = "id") String sortBy) {
-        return this.fatturaService.findAll(page, size, sortBy);
+    public Page<Fattura> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return this.fatturaService.findAll(page, size);
     }
 
-    @GetMapping("/cliente/{clienteId}")
-    public Page<Fattura> findByCliente(@PathVariable UUID clienteId,
-                                       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-                                       @RequestParam(defaultValue = "id") String sortBy) {
-        return this.fatturaService.findbyCliente(page, size, sortBy, clienteId);
+    @GetMapping("/{id_cliente}/fatture")
+    public Page<Fattura> findByCliente(@PathVariable UUID id_cliente,
+                                       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size
+    ) {
+        return this.fatturaService.findbyCliente(page, size, id_cliente);
     }
 
-    @GetMapping("/anno/{anno}")
-    public Page<Fattura> findByCliente(@PathVariable int anno,
-                                       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-                                       @RequestParam(defaultValue = "id") String sortBy) {
-        return this.fatturaService.findByAnno(page, size, sortBy, anno);
+    @GetMapping("/anno")
+    public Page<Fattura> findByAnno(
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam int anno) {
+        return this.fatturaService.findByAnno(page, size, anno);
     }
 
-    @GetMapping("/data/{data}")
+    @GetMapping("/dataFattura")
     public Page<Fattura> getFattureByData(
-            @PathVariable LocalDate data,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy) {
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam LocalDate data) {
         return fatturaService.findbyDataFattura(page, size, sortBy, data);
     }
 
-    @GetMapping("/stato/{statoFattura}")
+    @GetMapping("/stato")
     public Page<Fattura> getFattureByStato(
-            @PathVariable StatoFattura statoFattura,
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        return this.fatturaService.findFattureByStatoFattura(statoFattura, page, size, sortBy);
+            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) StatoFattura statoFattura) {
+        return this.fatturaService.findFattureByStatoFattura(statoFattura, page, size);
 
     }
 

@@ -14,6 +14,6 @@ public record FatturaDTO(
         @DecimalMax(value = "9999999.99", message = "L'importo deve essere massimo di 9 cifre")
         Double importo,
         LocalDate data,
-        StatoFattura statoFattura,
+        StatoFattura stato_fattura,
         UUID cliente_id) {
 }

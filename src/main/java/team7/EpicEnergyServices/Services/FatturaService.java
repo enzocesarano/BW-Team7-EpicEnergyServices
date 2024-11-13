@@ -27,14 +27,14 @@ public class FatturaService {
     public Fattura save(FatturaDTO body, UUID cliente_Id) throws Throwable {
         Cliente cliente = (Cliente) cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
 
-        Fattura newFattura = new Fattura(body.data(), body.importo(), body.statoFattura(), cliente);
+        Fattura newFattura = new Fattura(body.data(), body.importo(), body.stato_fattura(), cliente);
 
         return this.fR.save(newFattura);
     }
 
-    public Page<Fattura> findAll(int page, int size, String sortBy) {
+    public Page<Fattura> findAll(int page, int size) {
         if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Pageable pageable = PageRequest.of(page, size);
         return this.fR.findAll(pageable);
     }
 
@@ -46,22 +46,27 @@ public class FatturaService {
         Fattura found = this.findById(fatturaId);
 
 
-        found.setStatoFattura(body.statoFattura());
+        found.setStato_fattura(body.stato_fattura());
 
 
         return this.fR.save(found);
     }
 
 
-    public Page<Fattura> findbyCliente(int page, int size, String sortBy, UUID clienteID) {
+    public Page<Fattura> findbyCliente(int page, int size, UUID id_cliente) {
         if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return this.fR.findByCliente(pageable, clienteID);
+        Pageable pageable = PageRequest.of(page, size);
+        return this.fR.findByCliente(pageable, id_cliente);
     }
 
-    public Page<Fattura> findFattureByStatoFattura(StatoFattura statoFattura, int page, int size, String sortBy) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortBy));
-        return fR.findByStatoFattura(statoFattura, pageRequest);
+    public Page<Fattura> findFattureByStatoFattura(StatoFattura statoFattura, int page, int size) {
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            return fR.findByStatoFattura(statoFattura, pageRequest);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public Page<Fattura> findbyDataFattura(int page, int size, String sortBy, LocalDate data) {
@@ -82,13 +87,9 @@ public class FatturaService {
         this.fR.delete(found);
     }
 
-    public Page<Fattura> findByAnno(int page, int size, String sortBy, int anno) {
+    public Page<Fattura> findByAnno(int page, int size, int anno) {
         if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        LocalDate startDate = LocalDate.of(anno, 1, 1);
-        LocalDate endDate = LocalDate.of(anno, 12, 31);
-
-        return fR.findByDataFatturaBetween(startDate, endDate, pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        return this.fR.findByAnno(anno, pageable);
     }
-
 }

@@ -27,6 +27,7 @@ public class Comune {
 
     @ManyToOne
     @JoinColumn(name = "id_provincia")
+    @JsonManagedReference
     private Provincia provincia;
 
     @OneToMany(mappedBy = "comune")

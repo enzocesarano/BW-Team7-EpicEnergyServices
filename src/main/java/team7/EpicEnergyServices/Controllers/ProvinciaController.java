@@ -1,13 +1,12 @@
 package team7.EpicEnergyServices.Controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team7.EpicEnergyServices.Entities.Comune;
 import team7.EpicEnergyServices.Services.ProvinciaService;
 
 @RestController
@@ -29,6 +28,17 @@ public class ProvinciaController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/{nome}/comuni")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<Comune> findAllByNome(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "denominazione") String sortBy,
+            @PathVariable String nome
+    ) {
+        return provinciaService.findAllByProvincia_Nome(page, size, sortBy, nome);
     }
 
 }

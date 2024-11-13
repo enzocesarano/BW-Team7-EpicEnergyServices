@@ -53,7 +53,7 @@ public class ClienteController {
         return clienteService.saveCliente(payload, currentAuthenticatedUtente);
     }
 
-    @GetMapping("/me")
+    @GetMapping("/me/clienti")
     @ResponseStatus(HttpStatus.OK)
     public Page<Cliente> findAllByUser(
             @RequestParam(defaultValue = "0") int page,

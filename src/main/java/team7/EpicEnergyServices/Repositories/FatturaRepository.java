@@ -28,4 +28,5 @@ public interface FatturaRepository extends JpaRepository<Fattura, UUID> {
     @Query("SELECT f FROM Fattura f WHERE YEAR(f.dataFattura) = :anno")
     Page<Fattura> findByAnno(int anno, Pageable pageable);
 
+
 }

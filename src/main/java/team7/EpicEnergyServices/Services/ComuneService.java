@@ -19,25 +19,51 @@ public class ComuneService {
     @Autowired
     private ComuneRepository comuneRepository;
 
+    @Autowired
+    private ProvinciaService provinciaService;
+
     public void importaComuni(MultipartFile file) throws IOException {
         try {
             File tempFile = File.createTempFile("comuni", ".csv");
             file.transferTo(tempFile);
 
             List<String> lines = FileUtils.readLines(tempFile, "UTF-8");
+
+            String codiceProvinciaCorrente = "";
+            int progressivoComune = 1;
+
+            boolean firstLine = true;
             for (String line : lines) {
-                if (line.startsWith("Codice Provincia (Storico)(1);Progressivo del Comune (2);Denominazione in italiano")) {
+                if (firstLine) {
+                    firstLine = false;
                     continue;
                 }
+
                 String[] dati = line.split(";");
+                String codiceProvincia = dati[0].trim();
+                String progressivo = dati[1].trim();
+                String denominazione = dati[2].trim();
+
+
+                if (!codiceProvincia.equals(codiceProvinciaCorrente)) {
+                    codiceProvinciaCorrente = codiceProvincia;
+                    progressivoComune = 1;
+                }
+
+                if (progressivo.equals("#RIF!")) {
+                    progressivo = String.valueOf(progressivoComune);
+                }
+
+                progressivoComune++;
+
                 Comune comune = new Comune();
-                comune.setCodiceProvincia(dati[0]);
-                comune.setProgressivoComune(dati[1]);
-                comune.setDenominazione(dati[2]);
+                comune.setCodiceProvincia(codiceProvincia);
+                comune.setProgressivoComune(progressivo);
+                comune.setDenominazione(denominazione);
+
                 comuneRepository.save(comune);
             }
 
-            FileUtils.forceDelete(tempFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

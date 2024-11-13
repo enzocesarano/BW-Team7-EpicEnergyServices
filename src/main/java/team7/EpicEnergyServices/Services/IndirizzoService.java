@@ -32,7 +32,8 @@ public class IndirizzoService {
                 indirizzo.civico(),
                 indirizzo.localita(),
                 indirizzo.cap(),
-                comune
+                comune,
+                indirizzo.sede()
         );
         return indirizzoRepository.save(indirizzo1);
     }

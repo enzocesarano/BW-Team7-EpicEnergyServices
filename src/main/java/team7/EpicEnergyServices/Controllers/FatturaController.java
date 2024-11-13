@@ -95,4 +95,5 @@ public class FatturaController {
     public void findByIdAndDelete(@PathVariable UUID fatturaId) {
         this.fatturaService.findByIdAndDelete(fatturaId);
     }
+    
 }

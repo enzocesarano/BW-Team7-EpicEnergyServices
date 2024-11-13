@@ -53,4 +53,15 @@ public class Utente implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.tipoUtente.name()));
     }
+
+    @Override
+    public String toString() {
+        return "Utente{" +
+                "id_utente=" + id_utente +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", nome='" + nome + '\'' +
+                ", cognome='" + cognome + '\'' +
+                '}';
+    }
 }

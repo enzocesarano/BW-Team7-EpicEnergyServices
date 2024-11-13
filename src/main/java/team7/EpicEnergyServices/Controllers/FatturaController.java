@@ -61,14 +61,14 @@ public class FatturaController {
         return this.fatturaService.save(body, cliente_id);
     }
 
-    @PutMapping("/{fatturaId}")
-    public Fattura findByIdAndUpdate(@PathVariable UUID fatturaId, @RequestBody @Validated FatturaDTO body, BindingResult validationResult) {
-        if (validationResult.hasErrors()) {
-            validationResult.getAllErrors().forEach(System.out::println);
-            throw new BadRequestException("Ci sono stati errori nel payload!");
-        }
-        return this.fatturaService.findByIdAndUpdateStato(fatturaId, body);
-    }
+//    @PutMapping("/{fatturaId}")
+//    public Fattura findByIdAndUpdate(@PathVariable UUID fatturaId, @RequestBody @Validated FatturaDTO body, BindingResult validationResult) {
+//        if (validationResult.hasErrors()) {
+//            validationResult.getAllErrors().forEach(System.out::println);
+//            throw new BadRequestException("Ci sono stati errori nel payload!");
+//        }
+//        return this.fatturaService.findByIdAndUpdateStato(fatturaId, body);
+//    }
 
     @DeleteMapping("/{fatturaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
 import team7.EpicEnergyServices.Entities.Fattura;
+import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.NotFoundException;
+import team7.EpicEnergyServices.Exceptions.UnauthorizedException;
 import team7.EpicEnergyServices.Repositories.ClienteRepository;
 import team7.EpicEnergyServices.Repositories.FatturaRepository;
 import team7.EpicEnergyServices.dto.FatturaDTO;
+import team7.EpicEnergyServices.dto.StatoFatturaDTO;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -67,13 +70,12 @@ public class FatturaService {
         return this.fR.findById(fatturaId).orElseThrow(() -> new NotFoundException("fattura non trovata"));
     }
 
-    public Fattura findByIdAndUpdateStato(UUID fatturaId, FatturaDTO body) {
+    public Fattura findByIdAndUpdateStato(UUID fatturaId, StatoFatturaDTO body, Utente currentAuthenticatedUtente) {
         Fattura found = this.findById(fatturaId);
-
-
+        if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
+            throw new UnauthorizedException("Non hai i permessi per modificare questa fattura!");
+        }
         found.setStatoFattura(body.stato_fattura());
-
-
         return this.fR.save(found);
     }
 

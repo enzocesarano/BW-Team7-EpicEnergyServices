@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
 import team7.EpicEnergyServices.Entities.Fattura;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
@@ -27,43 +28,19 @@ public class FatturaController {
         return this.fatturaService.findAll(page, size);
     }
 
-    @GetMapping("/{id_cliente}/fatture")
-    public Page<Fattura> findByCliente(@PathVariable UUID id_cliente,
-                                       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size
-    ) {
-        return this.fatturaService.findbyCliente(page, size, id_cliente);
-    }
-
-    @GetMapping("/anno")
-    public Page<Fattura> findByAnno(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam int anno) {
-        return this.fatturaService.findByAnno(page, size, anno);
-    }
-
-    @GetMapping("/dataFattura")
-    public Page<Fattura> getFattureByData(
+    @GetMapping("/fatture")
+    public Page<Fattura> getFatture(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam LocalDate data) {
-        return fatturaService.findbyDataFattura(page, size, sortBy, data);
-    }
+            @RequestParam(defaultValue = "dataFattura") String sortBy,
+            @RequestParam(required = false) Integer anno,
+            @RequestParam(required = false) LocalDate dataFattura,
+            @RequestParam(required = false) StatoFattura stato_fattura,
+            @RequestParam(required = false) Double minImporto,
+            @RequestParam(required = false) Double maxImporto,
+            @RequestParam(required = false) Cliente cliente) {
 
-    @GetMapping("/stato")
-    public Page<Fattura> getFattureByStato(
-            @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) StatoFattura statoFattura) {
-        return this.fatturaService.findFattureByStatoFattura(statoFattura, page, size);
-
-    }
-
-    @GetMapping("/importo")
-    public Page<Fattura> getFattureByImportoRange(
-            @RequestParam double minImporto,
-            @RequestParam double maxImporto,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        return fatturaService.findByImporto(page, size, sortBy, minImporto, maxImporto);
+        return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente);
     }
 
     @GetMapping("/{fatturaId}")
@@ -98,5 +75,5 @@ public class FatturaController {
     public void findByIdAndDelete(@PathVariable UUID fatturaId) {
         this.fatturaService.findByIdAndDelete(fatturaId);
     }
-    
+
 }

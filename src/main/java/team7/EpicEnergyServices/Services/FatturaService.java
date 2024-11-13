@@ -19,16 +19,41 @@ import java.util.UUID;
 
 @Service
 public class FatturaService {
+    private final FatturaRepository fatturaRepository;
     @Autowired
     private FatturaRepository fR;
     @Autowired
     private ClienteRepository cR;
 
+    public FatturaService(FatturaRepository fatturaRepository) {
+        this.fatturaRepository = fatturaRepository;
+    }
+
+    public Page<Fattura> getFatture(int page, int size, String sortBy, Integer anno, LocalDate dataFattura,
+                                    StatoFattura stato_fattura, Double minImporto, Double maxImporto, Cliente cliente) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+
+        if (cliente != null) {
+            return fatturaRepository.findAllByCliente(cliente, pageable);
+        } else if (stato_fattura != null) {
+            return fatturaRepository.findByStatoFattura(stato_fattura, pageable);
+        } else if (dataFattura != null) {
+            return fatturaRepository.findByDataFattura(dataFattura, pageable);
+        } else if (anno != null) {
+            return fatturaRepository.findByAnno(anno, pageable);
+        } else if (minImporto != null && maxImporto != null) {
+            return fatturaRepository.findByImportoBetween(minImporto, maxImporto, pageable);
+        }
+
+        return fatturaRepository.findAll(pageable);
+    }
+
     public Fattura save(FatturaDTO body, UUID cliente_Id) throws Throwable {
         Cliente cliente = (Cliente) cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
 
-        Fattura newFattura = new Fattura(body.data(), body.importo(), body.stato_fattura(), cliente);
-
+        Fattura newFattura = new Fattura(body.importo(), cliente);
         return this.fR.save(newFattura);
     }
 
@@ -46,50 +71,15 @@ public class FatturaService {
         Fattura found = this.findById(fatturaId);
 
 
-        found.setStato_fattura(body.stato_fattura());
+        found.setStatoFattura(body.stato_fattura());
 
 
         return this.fR.save(found);
     }
 
 
-    public Page<Fattura> findbyCliente(int page, int size, UUID id_cliente) {
-        if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size);
-        return this.fR.findByCliente(pageable, id_cliente);
-    }
-
-    public Page<Fattura> findFattureByStatoFattura(StatoFattura statoFattura, int page, int size) {
-        try {
-            PageRequest pageRequest = PageRequest.of(page, size);
-            return fR.findByStatoFattura(statoFattura, pageRequest);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public Page<Fattura> findbyDataFattura(int page, int size, String sortBy, LocalDate data) {
-        if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return this.fR.findByDataFattura(pageable, data);
-    }
-
-    public Page<Fattura> findByImporto(int page, int size, String sortBy, double minimo, double massimo) {
-        if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return this.fR.findByImportoBetween(pageable, minimo, massimo);
-    }
-
-
     public void findByIdAndDelete(UUID fatturaId) {
         Fattura found = this.findById(fatturaId);
         this.fR.delete(found);
-    }
-
-    public Page<Fattura> findByAnno(int page, int size, int anno) {
-        if (size > 100) size = 100;
-        Pageable pageable = PageRequest.of(page, size);
-        return this.fR.findByAnno(anno, pageable);
     }
 }

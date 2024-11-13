@@ -52,13 +52,13 @@ public record ClienteDTO(
         @Pattern(regexp = "\\+?\\d{7,15}", message = "Inserisci un numero di telefono di contatto valido.")
         String telefonoContatto,
 
-        @NotNull(message = "La sede legale è obbligatoria.")
+        //@NotNull(message = "La sede legale è obbligatoria.")
         Indirizzo sedeLegale,
 
-        @NotEmpty(message = "La lista delle sedi operative non può essere vuota.")
+        // @NotEmpty(message = "La lista delle sedi operative non può essere vuota.")
         List<Indirizzo> sedeOperativa,
 
-        @NotNull(message = "Il tipo cliente è obbligatorio.")
-        @Pattern(regexp = "PA|SAS|SPA|SRL", message = "Il tipo cliente deve essere uno tra: PA, SAS, SPA, SRL.")
+        //  @NotNull(message = "Il tipo cliente è obbligatorio.")
+        //  @Pattern(regexp = "PA|SAS|SPA|SRL", message = "Il tipo cliente deve essere uno tra: PA, SAS, SPA, SRL.")
         TipoCliente tipoCliente) {
 }

@@ -82,4 +82,13 @@ public class FatturaService {
         this.fR.delete(found);
     }
 
+    public Page<Fattura> findByAnno(int page, int size, String sortBy, int anno) {
+        if (size > 100) size = 100;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        LocalDate startDate = LocalDate.of(anno, 1, 1);
+        LocalDate endDate = LocalDate.of(anno, 12, 31);
+
+        return fR.findByDataFatturaBetween(startDate, endDate, pageable);
+    }
+
 }

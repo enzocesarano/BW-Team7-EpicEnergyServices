@@ -35,6 +35,13 @@ public class FatturaController {
         return this.fatturaService.findbyCliente(page, size, sortBy, clienteId);
     }
 
+    @GetMapping("/anno/{anno}")
+    public Page<Fattura> findByCliente(@PathVariable int anno,
+                                       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+                                       @RequestParam(defaultValue = "id") String sortBy) {
+        return this.fatturaService.findByAnno(page, size, sortBy, anno);
+    }
+
     @GetMapping("/data/{data}")
     public Page<Fattura> getFattureByData(
             @PathVariable LocalDate data,

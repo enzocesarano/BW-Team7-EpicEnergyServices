@@ -2,7 +2,6 @@ package team7.EpicEnergyServices.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Comune;
 import team7.EpicEnergyServices.Entities.Indirizzo;
 import team7.EpicEnergyServices.Repositories.ClienteRepository;
@@ -24,28 +23,28 @@ public class IndirizzoService {
     @Autowired
     private IndirizzoRepository indirizzoRepository;
 
-    public Indirizzo createIndirizzo(IndirizzoDTO indirizzoDTO) {
-        Indirizzo indirizzo = convertDtoToEntity(indirizzoDTO);
-        return indirizzoRepository.save(indirizzo);
-    }
+    public Indirizzo createIndirizzo(IndirizzoDTO indirizzo) {
+        Comune comune = comuneRepository.findById(indirizzo.comune())
+                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + indirizzo.comune()));
 
-    private Indirizzo convertDtoToEntity(IndirizzoDTO dto) {
-
-        Cliente cliente = clienteRepository.findById(dto.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
-
-        Comune comune = comuneRepository.findById(dto.comuneId())
-                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
-
-        return new Indirizzo(
-                dto.via(),
-                dto.civico(),
-                dto.localita(),
-                dto.cap(),
+        Indirizzo indirizzo1 = new Indirizzo(
+                indirizzo.via(),
+                indirizzo.civico(),
+                indirizzo.localita(),
+                indirizzo.cap(),
                 comune,
-                cliente
+                indirizzo.sede()
         );
+        return indirizzoRepository.save(indirizzo1);
     }
+
+//    private Indirizzo convertDtoToEntity(IndirizzoDTO dto) {
+//
+//        Cliente cliente = clienteRepository.findById(dto.clienteId())
+//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
+//
+//
+//    }
 
 
     public List<Indirizzo> getAllIndirizzi() {
@@ -65,12 +64,12 @@ public class IndirizzoService {
         indirizzo.setLocalita(dto.localita());
         indirizzo.setCap(dto.cap());
 
-        Cliente cliente = clienteRepository.findById(dto.clienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
-        indirizzo.setCliente(cliente);
+//        Cliente cliente = clienteRepository.findById(dto.clienteId())
+//                .orElseThrow(() -> new RuntimeException("Cliente non trovato con ID: " + dto.clienteId()));
+//        indirizzo.setCliente(cliente);
 
-        Comune comune = comuneRepository.findById(dto.comuneId())
-                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comuneId()));
+        Comune comune = comuneRepository.findById(dto.comune())
+                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comune()));
         indirizzo.setComune(comune);
 
         return indirizzoRepository.save(indirizzo);

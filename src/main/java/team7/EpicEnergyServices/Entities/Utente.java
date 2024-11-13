@@ -1,5 +1,6 @@
 package team7.EpicEnergyServices.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class Utente implements UserDetails {
     private TipoUtente tipoUtente;
 
     @OneToMany(mappedBy = "id_cliente")
+    @JsonBackReference
     private List<Cliente> clienti;
 
     public Utente(String username, String email, String password, String nome, String cognome) {

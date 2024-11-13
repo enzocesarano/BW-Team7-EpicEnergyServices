@@ -1,11 +1,13 @@
 package team7.EpicEnergyServices.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import team7.EpicEnergyServices.Entities.Enums.TipoIndirizzo;
 
 import java.util.UUID;
 
@@ -32,14 +34,19 @@ public class Indirizzo {
 
     @ManyToOne
     @JoinColumn(name = "id_comune")
+    @JsonBackReference
     private Comune comune;
 
-    public Indirizzo(String via, String civico, String località, String cap, Comune comune, Cliente cliente) {
+    @Enumerated(EnumType.STRING)
+    private TipoIndirizzo tipoSede;
+
+    @JsonCreator
+    public Indirizzo(String via, String civico, String localita, String cap, Comune comune, TipoIndirizzo tipoSede) {
         this.via = via;
         this.civico = civico;
         this.localita = localita;
         this.cap = cap;
         this.comune = comune;
-        this.cliente = cliente;
+        this.tipoSede = tipoSede;
     }
 }

@@ -3,6 +3,7 @@ package team7.EpicEnergyServices.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -29,7 +30,7 @@ public class ClienteController {
     public Page<Cliente> findAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ragione_sociale") String sortBy) {
+            @RequestParam(defaultValue = "ragioneSociale") String sortBy) {
         return clienteService.findAll(page, size, sortBy);
     }
 
@@ -39,7 +40,7 @@ public class ClienteController {
         return clienteService.findById(id_cliente);
     }
 
-    @PostMapping("/me/clienti")
+    @PostMapping(value = "/me/clienti", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente createCliente(
             @RequestBody @Validated ClienteDTO payload,
@@ -52,28 +53,29 @@ public class ClienteController {
         return clienteService.saveCliente(payload, currentAuthenticatedUtente);
     }
 
-    @GetMapping("/me/clienti")
+    @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     public Page<Cliente> findAllByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ragione_sociale") String sortBy,
+            @RequestParam(defaultValue = "ragioneSociale") String sortBy,
             @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
-        return clienteService.findAllByUser(page, size, sortBy, currentAuthenticatedUtente);
+        return clienteService.findAllByUtente(page, size, sortBy, currentAuthenticatedUtente);
     }
 
-    @PutMapping("/{id_cliente}")
+    @PutMapping("/me/clienti/{id_cliente}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('USER')")
     public Cliente updateCliente(
             @PathVariable UUID id_cliente,
             @RequestBody @Validated ClienteDTO payload,
-            BindingResult validationResult) {
+            BindingResult validationResult,
+            @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         if (validationResult.hasErrors()) {
             validationResult.getAllErrors().forEach(System.out::println);
             throw new BadRequestException("Errore nei dati forniti!");
         }
-        return clienteService.findByIdAndUpdate(id_cliente, payload);
+        return clienteService.findByIdAndUpdate(id_cliente, payload, currentAuthenticatedUtente);
     }
 
     @DeleteMapping("/{id_cliente}")

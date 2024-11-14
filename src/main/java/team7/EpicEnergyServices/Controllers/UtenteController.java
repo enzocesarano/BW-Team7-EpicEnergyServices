@@ -116,11 +116,10 @@ public class UtenteController {
             @RequestParam(required = false) LocalDate dataInserimento,
             @RequestParam(required = false) LocalDate dataUltimoContatto,
             @RequestParam(required = false) String parteRagioneSociale,
-            @RequestParam(required = false) String provinciaSedeLegale,
             @AuthenticationPrincipal Utente currentAuthenticatedUser) {
 
         return clienteService.getClienti(page, size, sortBy, minFatturato, maxFatturato,
-                dataInserimento, dataUltimoContatto, parteRagioneSociale, provinciaSedeLegale, currentAuthenticatedUser);
+                dataInserimento, dataUltimoContatto, parteRagioneSociale, currentAuthenticatedUser);
     }
 
     @PutMapping("/me/clienti/{id_cliente}")

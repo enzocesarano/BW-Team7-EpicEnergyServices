@@ -20,23 +20,12 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/clienti")
 public class ClienteController {
 
     @Autowired
     private ClienteService clienteService;
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<Cliente> findAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "ragioneSociale") String sortBy) {
-        return clienteService.findAll(page, size, sortBy);
-    }
-
-    @GetMapping("/{id_cliente}")
+    @GetMapping("/clienti/{id_cliente}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public Cliente findById(@PathVariable UUID id_cliente) {
@@ -44,7 +33,7 @@ public class ClienteController {
     }
 
 
-    @DeleteMapping("/{id_cliente}")
+    @DeleteMapping("/clienti/{id_cliente}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCliente(@PathVariable UUID id_cliente) {

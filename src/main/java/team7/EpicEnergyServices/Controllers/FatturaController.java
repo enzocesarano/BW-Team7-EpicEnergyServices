@@ -21,17 +21,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/fatture")
 public class FatturaController {
     @Autowired
     private FatturaService fatturaService;
 
-    @GetMapping
-    public Page<Fattura> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return this.fatturaService.findAll(page, size);
-    }
-
-    @GetMapping("/source")
+    @GetMapping("/me/fatture")
     public Page<Fattura> getFatture(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -46,14 +40,14 @@ public class FatturaController {
         return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente);
     }
 
-    @GetMapping("/{fatturaId}")
+    @GetMapping("me/{fatturaId}")
     public Fattura findById(@PathVariable UUID fatturaId) {
         return this.fatturaService.findById(fatturaId);
     }
 
-    @PostMapping
+    @PostMapping("/me/clienti/{id_cliente}/fatture")
     @ResponseStatus(HttpStatus.CREATED)
-    public Fattura save(@RequestBody @Validated FatturaDTO body, UUID cliente_id, BindingResult validationResult) throws Throwable {
+    public Fattura save(@RequestBody @Validated FatturaDTO body, @PathVariable UUID cliente_id, BindingResult validationResult) throws Throwable {
 
         if (validationResult.hasErrors()) {
             String message = validationResult.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage())
@@ -73,7 +67,7 @@ public class FatturaController {
 //        return this.fatturaService.findByIdAndUpdateStato(fatturaId, body);
 //    }
 
-    @DeleteMapping("/{fatturaId}")
+    @DeleteMapping("/me/{fatturaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete(@PathVariable UUID fatturaId) {
         this.fatturaService.findByIdAndDelete(fatturaId);

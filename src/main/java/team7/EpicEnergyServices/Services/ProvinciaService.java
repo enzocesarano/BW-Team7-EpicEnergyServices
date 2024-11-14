@@ -18,128 +18,11 @@ import team7.EpicEnergyServices.Repositories.ProvinciaRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 @Service
 public class ProvinciaService {
-
-    private static final Map<String, String> provinciaSiglaCorretta = new HashMap<>();
-
-    static {
-        provinciaSiglaCorretta.put("Agrigento", "AG");
-        provinciaSiglaCorretta.put("Alessandria", "AL");
-        provinciaSiglaCorretta.put("Ancona", "AN");
-        provinciaSiglaCorretta.put("Aosta", "AO");
-        provinciaSiglaCorretta.put("L'Aquila", "AQ");
-        provinciaSiglaCorretta.put("Arezzo", "AR");
-        provinciaSiglaCorretta.put("Ascoli-Piceno", "AP");
-        provinciaSiglaCorretta.put("Asti", "AT");
-        provinciaSiglaCorretta.put("Avellino", "AV");
-        provinciaSiglaCorretta.put("Bari", "BA");
-        provinciaSiglaCorretta.put("Barletta-Andria-Trani", "BT");
-        provinciaSiglaCorretta.put("Belluno", "BL");
-        provinciaSiglaCorretta.put("Benevento", "BN");
-        provinciaSiglaCorretta.put("Bergamo", "BG");
-        provinciaSiglaCorretta.put("Biella", "BI");
-        provinciaSiglaCorretta.put("Bologna", "BO");
-        provinciaSiglaCorretta.put("Bolzano", "BZ");
-        provinciaSiglaCorretta.put("Brescia", "BS");
-        provinciaSiglaCorretta.put("Brindisi", "BR");
-        provinciaSiglaCorretta.put("Cagliari", "CA");
-        provinciaSiglaCorretta.put("Caltanissetta", "CL");
-        provinciaSiglaCorretta.put("Campobasso", "CB");
-        provinciaSiglaCorretta.put("Carbonia Iglesias", "CI");
-        provinciaSiglaCorretta.put("Caserta", "CE");
-        provinciaSiglaCorretta.put("Catania", "CT");
-        provinciaSiglaCorretta.put("Catanzaro", "CZ");
-        provinciaSiglaCorretta.put("Chieti", "CH");
-        provinciaSiglaCorretta.put("Como", "CO");
-        provinciaSiglaCorretta.put("Cosenza", "CS");
-        provinciaSiglaCorretta.put("Cremona", "CR");
-        provinciaSiglaCorretta.put("Crotone", "KR");
-        provinciaSiglaCorretta.put("Cuneo", "CN");
-        provinciaSiglaCorretta.put("Enna", "EN");
-        provinciaSiglaCorretta.put("Fermo", "FM");
-        provinciaSiglaCorretta.put("Ferrara", "FE");
-        provinciaSiglaCorretta.put("Firenze", "FI");
-        provinciaSiglaCorretta.put("Foggia", "FG");
-        provinciaSiglaCorretta.put("Forli-Cesena", "FC");
-        provinciaSiglaCorretta.put("Frosinone", "FR");
-        provinciaSiglaCorretta.put("Genova", "GE");
-        provinciaSiglaCorretta.put("Gorizia", "GO");
-        provinciaSiglaCorretta.put("Grosseto", "GR");
-        provinciaSiglaCorretta.put("Imperia", "IM");
-        provinciaSiglaCorretta.put("Isernia", "IS");
-        provinciaSiglaCorretta.put("La-Spezia", "SP");
-        provinciaSiglaCorretta.put("Latina", "LT");
-        provinciaSiglaCorretta.put("Lecce", "LE");
-        provinciaSiglaCorretta.put("Lecco", "LC");
-        provinciaSiglaCorretta.put("Livorno", "LI");
-        provinciaSiglaCorretta.put("Lodi", "LO");
-        provinciaSiglaCorretta.put("Lucca", "LU");
-        provinciaSiglaCorretta.put("Macerata", "MC");
-        provinciaSiglaCorretta.put("Mantova", "MN");
-        provinciaSiglaCorretta.put("Massa-Carrara", "MS");
-        provinciaSiglaCorretta.put("Matera", "MT");
-        provinciaSiglaCorretta.put("Medio Campidano", "VS");
-        provinciaSiglaCorretta.put("Messina", "ME");
-        provinciaSiglaCorretta.put("Milano", "MI");
-        provinciaSiglaCorretta.put("Modena", "MO");
-        provinciaSiglaCorretta.put("Monza-Brianza", "MB");
-        provinciaSiglaCorretta.put("Napoli", "NA");
-        provinciaSiglaCorretta.put("Novara", "NO");
-        provinciaSiglaCorretta.put("Nuoro", "NU");
-        provinciaSiglaCorretta.put("Ogliastra", "OG");
-        provinciaSiglaCorretta.put("Olbia Tempio", "OT");
-        provinciaSiglaCorretta.put("Oristano", "OR");
-        provinciaSiglaCorretta.put("Padova", "PD");
-        provinciaSiglaCorretta.put("Palermo", "PA");
-        provinciaSiglaCorretta.put("Parma", "PR");
-        provinciaSiglaCorretta.put("Pavia", "PV");
-        provinciaSiglaCorretta.put("Perugia", "PG");
-        provinciaSiglaCorretta.put("Pesaro-Urbino", "PU");
-        provinciaSiglaCorretta.put("Pescara", "PE");
-        provinciaSiglaCorretta.put("Piacenza", "PC");
-        provinciaSiglaCorretta.put("Pisa", "PI");
-        provinciaSiglaCorretta.put("Pistoia", "PT");
-        provinciaSiglaCorretta.put("Pordenone", "PN");
-        provinciaSiglaCorretta.put("Potenza", "PZ");
-        provinciaSiglaCorretta.put("Prato", "PO");
-        provinciaSiglaCorretta.put("Ragusa", "RG");
-        provinciaSiglaCorretta.put("Ravenna", "RA");
-        provinciaSiglaCorretta.put("Reggio-Calabria", "RC");
-        provinciaSiglaCorretta.put("Reggio-Emilia", "RE");
-        provinciaSiglaCorretta.put("Rieti", "RI");
-        provinciaSiglaCorretta.put("Rimini", "RN");
-        provinciaSiglaCorretta.put("Roma", "RM");
-        provinciaSiglaCorretta.put("Rovigo", "RO");
-        provinciaSiglaCorretta.put("Salerno", "SA");
-        provinciaSiglaCorretta.put("Sassari", "SS");
-        provinciaSiglaCorretta.put("Savona", "SV");
-        provinciaSiglaCorretta.put("Siena", "SI");
-        provinciaSiglaCorretta.put("Siracusa", "SR");
-        provinciaSiglaCorretta.put("Sondrio", "SO");
-        provinciaSiglaCorretta.put("Taranto", "TA");
-        provinciaSiglaCorretta.put("Teramo", "TE");
-        provinciaSiglaCorretta.put("Terni", "TR");
-        provinciaSiglaCorretta.put("Torino", "TO");
-        provinciaSiglaCorretta.put("Trapani", "TP");
-        provinciaSiglaCorretta.put("Trento", "TN");
-        provinciaSiglaCorretta.put("Treviso", "TV");
-        provinciaSiglaCorretta.put("Trieste", "TS");
-        provinciaSiglaCorretta.put("Udine", "UD");
-        provinciaSiglaCorretta.put("Varese", "VA");
-        provinciaSiglaCorretta.put("Venezia", "VE");
-        provinciaSiglaCorretta.put("Verbania", "VB");
-        provinciaSiglaCorretta.put("Vercelli", "VC");
-        provinciaSiglaCorretta.put("Verona", "VR");
-        provinciaSiglaCorretta.put("Vibo-Valentia", "VV");
-        provinciaSiglaCorretta.put("Vicenza", "VI");
-        provinciaSiglaCorretta.put("Viterbo", "VT");
-    }
 
     @Autowired
     private ProvinciaRepository provinciaRepository;
@@ -165,8 +48,8 @@ public class ProvinciaService {
                 String provincia = dati[1].trim();
                 String regione = dati[2].trim();
 
-                if (provinciaSiglaCorretta.containsKey(provincia)) {
-                    sigla = provinciaSiglaCorretta.get(provincia);
+                if (sigla.matches("(?i).*roma.*")) {
+                    sigla = "RM";
                 }
 
                 if (provincia.matches("(?i).*verbania.*")) {

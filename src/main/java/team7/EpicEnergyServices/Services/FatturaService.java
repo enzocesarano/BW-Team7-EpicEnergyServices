@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
@@ -32,25 +33,33 @@ public class FatturaService {
         this.fatturaRepository = fatturaRepository;
     }
 
-    public Page<Fattura> getFatture(int page, int size, String sortBy, Integer anno, LocalDate dataFattura,
-                                    StatoFattura stato_fattura, Double minImporto, Double maxImporto, Cliente cliente) {
-
+    public Page<Fattura> getFatture(int page, int size, String sortBy, int anno, LocalDate dataFattura,
+                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
+        Specification<Fattura> spec = Specification.where(null);
 
         if (cliente != null) {
-            return fatturaRepository.findAllByCliente(cliente, pageable);
-        } else if (stato_fattura != null) {
-            return fatturaRepository.findByStatoFattura(stato_fattura, pageable);
-        } else if (dataFattura != null) {
-            return fatturaRepository.findByDataFattura(dataFattura, pageable);
-        } else if (anno != null) {
-            return fatturaRepository.findByAnno(anno, pageable);
-        } else if (minImporto != null && maxImporto != null) {
-            return fatturaRepository.findByImportoBetween(minImporto, maxImporto, pageable);
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("cliente"), cliente));
+        }
+        if (statoFattura != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("statoFattura"), statoFattura));
+        }
+        if (dataFattura != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dataFattura"), dataFattura));
+        }
+        if (anno > 0) {
+            spec = spec.and((root, query, criteriaBuilder) -> {
+                LocalDate startOfYear = LocalDate.of(anno, 1, 1);
+                LocalDate endOfYear = LocalDate.of(anno, 12, 31);
+                return criteriaBuilder.between(root.get("dataFattura"), startOfYear, endOfYear);
+            });
+        }
+        if (minImporto != null && maxImporto != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.between(root.get("importo"), minImporto, maxImporto));
         }
 
-        return fatturaRepository.findAll(pageable);
+        return fatturaRepository.findAll(spec, pageable);
     }
 
     public Fattura save(FatturaDTO body, UUID cliente_Id) throws Throwable {

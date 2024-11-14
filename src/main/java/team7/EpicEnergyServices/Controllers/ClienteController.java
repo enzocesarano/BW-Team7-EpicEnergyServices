@@ -11,6 +11,7 @@ import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Services.ClienteService;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -47,5 +48,21 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.OK)
     public String uploadAvatar(@RequestParam("avatar") MultipartFile file, @PathVariable UUID id_dipendente, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         return this.clienteService.updateAvatar(file, id_dipendente, currentAuthenticatedUtente);
+    }
+
+    @GetMapping("/cliente")
+    public Page<Cliente> getClienti(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ragioneSociale") String sortBy,
+            @RequestParam(required = false) Double minFatturato,
+            @RequestParam(required = false) Double maxFatturato,
+            @RequestParam(required = false) LocalDate dataInserimento,
+            @RequestParam(required = false) LocalDate dataUltimoContatto,
+            @RequestParam(required = false) String parteRagioneSociale,
+            @RequestParam(required = false) String provinciaSedeLegale) {
+
+        return clienteService.getClienti(page, size, sortBy, minFatturato, maxFatturato,
+                dataInserimento, dataUltimoContatto, parteRagioneSociale, provinciaSedeLegale);
     }
 }

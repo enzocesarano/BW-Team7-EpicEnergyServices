@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Cliente;
@@ -21,6 +22,7 @@ import team7.EpicEnergyServices.Repositories.IndirizzoRepository;
 import team7.EpicEnergyServices.dto.ClienteDTO;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -177,5 +179,35 @@ public class ClienteService {
         cliente.setLogoAziendale(url);
         this.clienteRepository.save(cliente);
         return url;
+    }
+
+    public Page<Cliente> getClienti(int page, int size, String sortBy, Double minFatturato, Double maxFatturato, LocalDate dataInserimento, LocalDate dataUltimoContatto, String parteRagioneSociale, String provinciaSedeLegale) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        Specification<Cliente> spec = Specification.where(null);
+
+        if (minFatturato != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("fatturatoAnnuale"), minFatturato));
+        }
+        if (maxFatturato != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("fatturatoAnnuale"), maxFatturato));
+        }
+        if (dataInserimento != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dataInserimento"), dataInserimento));
+        }
+        if (dataUltimoContatto != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dataUltimoContatto"), dataUltimoContatto));
+        }
+        if (parteRagioneSociale != null && !parteRagioneSociale.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(
+                            criteriaBuilder.lower(root.get("ragioneSociale")),
+                            "%" + parteRagioneSociale.toLowerCase() + "%"));
+        }
+        if (provinciaSedeLegale != null && !provinciaSedeLegale.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("provinciaSedeLegale"), provinciaSedeLegale));
+        }
+
+        return clienteRepository.findAll(spec, pageable);
     }
 }

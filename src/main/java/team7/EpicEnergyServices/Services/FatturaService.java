@@ -33,7 +33,7 @@ public class FatturaService {
         this.fatturaRepository = fatturaRepository;
     }
 
-    public Page<Fattura> getFatture(int page, int size, String sortBy, int anno, LocalDate dataFattura,
+    public Page<Fattura> getFatture(int page, int size, String sortBy, Integer anno, LocalDate dataFattura,
                                     StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
@@ -48,7 +48,7 @@ public class FatturaService {
         if (dataFattura != null) {
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dataFattura"), dataFattura));
         }
-        if (anno > 0) {
+        if (anno != null) {
             spec = spec.and((root, query, criteriaBuilder) -> {
                 LocalDate startOfYear = LocalDate.of(anno, 1, 1);
                 LocalDate endOfYear = LocalDate.of(anno, 12, 31);

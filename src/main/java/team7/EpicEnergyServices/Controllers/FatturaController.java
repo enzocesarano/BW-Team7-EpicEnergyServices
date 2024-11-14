@@ -3,22 +3,25 @@ package team7.EpicEnergyServices.Controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
 import team7.EpicEnergyServices.Entities.Fattura;
+import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
 import team7.EpicEnergyServices.Services.FatturaService;
 import team7.EpicEnergyServices.dto.FatturaDTO;
+import team7.EpicEnergyServices.dto.StatoFatturaDTO;
 
 import java.time.LocalDate;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/fattura")
+@RequestMapping("/fatture")
 public class FatturaController {
     @Autowired
     private FatturaService fatturaService;
@@ -28,7 +31,7 @@ public class FatturaController {
         return this.fatturaService.findAll(page, size);
     }
 
-    @GetMapping("/fatture")
+    @GetMapping("/source")
     public Page<Fattura> getFatture(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -75,5 +78,18 @@ public class FatturaController {
     public void findByIdAndDelete(@PathVariable UUID fatturaId) {
         this.fatturaService.findByIdAndDelete(fatturaId);
     }
+
+    @PutMapping("/me/{fatturaId}")
+    public Fattura findByIdAndUpdate(@PathVariable UUID fatturaId,
+                                     @RequestBody @Validated StatoFatturaDTO body,
+                                     BindingResult validationResult,
+                                     @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+        if (validationResult.hasErrors()) {
+            validationResult.getAllErrors().forEach(System.out::println);
+            throw new BadRequestException("Ci sono stati errori nel payload!");
+        }
+        return this.fatturaService.findByIdAndUpdateStato(fatturaId, body, currentAuthenticatedUtente);
+    }
+
 
 }

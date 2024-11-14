@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/indirizzi")
+@RequestMapping("/indirizzi")
 public class IndirizzoController {
 
     @Autowired

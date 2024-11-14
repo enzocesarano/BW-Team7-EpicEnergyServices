@@ -102,7 +102,7 @@ public class ClienteService {
                     return indirizzoOperativo;
                 })
                 .collect(Collectors.toList());
-        newCliente.setSedeOperativa(sedeOperativaList);
+        newCliente.setSedi(sedeOperativaList);
         return clienteRepository.save(newCliente);
     }
 
@@ -148,7 +148,7 @@ public class ClienteService {
                     return indirizzo;
                 })
                 .collect(Collectors.toList());
-        cliente.setSedeOperativa(sediList);
+        cliente.setSedi(sediList);
         return clienteRepository.save(cliente);
     }
 

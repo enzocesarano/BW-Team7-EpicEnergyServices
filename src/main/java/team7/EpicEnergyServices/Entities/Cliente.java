@@ -45,7 +45,7 @@ public class Cliente {
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Indirizzo> sedeOperativa;
+    private List<Indirizzo> sedi;
 
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Fattura> fatture;
@@ -57,7 +57,7 @@ public class Cliente {
     @Enumerated(EnumType.STRING)
     private TipoCliente tipoCliente;
 
-    public Cliente(String ragioneSociale, String partita_iva, String email, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, List<Indirizzo> sedeOperativa) {
+    public Cliente(String ragioneSociale, String partita_iva, String email, String pec, String telefono, String emailContatto, String nomeContatto, String cognomeContatto, String telefonoContatto, List<Indirizzo> sedi) {
         this.ragioneSociale = ragioneSociale;
         this.partita_iva = partita_iva;
         this.email = email;
@@ -67,7 +67,7 @@ public class Cliente {
         this.nomeContatto = nomeContatto;
         this.cognomeContatto = cognomeContatto;
         this.telefonoContatto = telefonoContatto;
-        this.sedeOperativa = sedeOperativa;
+        this.sedi = sedi;
         this.dataInserimento = LocalDate.now();
     }
 }

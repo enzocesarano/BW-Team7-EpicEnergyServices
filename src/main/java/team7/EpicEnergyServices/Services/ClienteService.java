@@ -2,6 +2,8 @@ package team7.EpicEnergyServices.Services;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Comune;
+import team7.EpicEnergyServices.Entities.Enums.TipoIndirizzo;
+import team7.EpicEnergyServices.Entities.Enums.TipoUtente;
 import team7.EpicEnergyServices.Entities.Indirizzo;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
@@ -51,11 +55,11 @@ public class ClienteService {
         return clienteRepository.findAll(pageable);
     }
 
-    public Page<Cliente> findAllByUtente(int page, int size, String sortBy, Utente currentAuthenticatedUtente) {
-        if (size > 15) size = 15;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return clienteRepository.findAllByUtente(currentAuthenticatedUtente, pageable);
-    }
+//    public Page<Cliente> findAllByUtente(int page, int size, String sortBy, Utente currentAuthenticatedUtente) {
+//        if (size > 15) size = 15;
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+//        return clienteRepository.findAllByUtente(currentAuthenticatedUtente, pageable);
+//    }
 
     public Cliente findById(UUID id_cliente) {
         return clienteRepository.findById(id_cliente)
@@ -90,7 +94,7 @@ public class ClienteService {
                     if (sede.comune() == null) {
                         throw new BadRequestException("Comune non fornito per la sede operativa");
                     }
-                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+                    Comune comuneOperativo = this.comuneService.findByDenominazione(sede.comune());
                     Indirizzo indirizzoOperativo = new Indirizzo(
                             sede.via(),
                             sede.civico(),
@@ -135,7 +139,7 @@ public class ClienteService {
                         throw new BadRequestException("Comune non fornito per la sede");
                     }
 
-                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+                    Comune comuneOperativo = this.comuneService.findByDenominazione(sede.comune());
 
                     Indirizzo indirizzo = new Indirizzo(
                             sede.via(),
@@ -181,22 +185,45 @@ public class ClienteService {
         return url;
     }
 
-    public Page<Cliente> getClienti(int page, int size, String sortBy, Double minFatturato, Double maxFatturato, LocalDate dataInserimento, LocalDate dataUltimoContatto, String parteRagioneSociale, String provinciaSedeLegale) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+    public Page<Cliente> getClienti(int page, int size, String sortBy, Double minFatturato, Double maxFatturato, LocalDate dataInserimento, LocalDate dataUltimoContatto, String parteRagioneSociale, Utente currentAuthenticatedUser) {
+        Sort sort;
+        if (sortBy.equals("provincia")) {
+            sort = Sort.by(Sort.Order.asc("sedi.comune.provincia.nome").ignoreCase());
+        } else {
+            sort = Sort.by(sortBy);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         Specification<Cliente> spec = Specification.where(null);
 
+        if (currentAuthenticatedUser != null) {
+            if (currentAuthenticatedUser.getTipoUtente() != TipoUtente.ADMIN) {
+                spec = spec.and((root, query, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("utente"), currentAuthenticatedUser));
+            }
+        }
+
+        spec = spec.and((root, query, criteriaBuilder) -> {
+            Join<Cliente, Indirizzo> sediJoin = root.join("sedi", JoinType.INNER);
+            return criteriaBuilder.equal(sediJoin.get("tipoSede"), TipoIndirizzo.LEGALE);
+        });
+
         if (minFatturato != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("fatturatoAnnuale"), minFatturato));
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("fatturatoAnnuale"), minFatturato));
         }
         if (maxFatturato != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("fatturatoAnnuale"), maxFatturato));
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("fatturatoAnnuale"), maxFatturato));
         }
         if (dataInserimento != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dataInserimento"), dataInserimento));
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("dataInserimento"), dataInserimento));
         }
         if (dataUltimoContatto != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("dataUltimoContatto"), dataUltimoContatto));
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("dataUltimoContatto"), dataUltimoContatto));
         }
         if (parteRagioneSociale != null && !parteRagioneSociale.isEmpty()) {
             spec = spec.and((root, query, criteriaBuilder) ->
@@ -204,10 +231,8 @@ public class ClienteService {
                             criteriaBuilder.lower(root.get("ragioneSociale")),
                             "%" + parteRagioneSociale.toLowerCase() + "%"));
         }
-        if (provinciaSedeLegale != null && !provinciaSedeLegale.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("provinciaSedeLegale"), provinciaSedeLegale));
-        }
 
         return clienteRepository.findAll(spec, pageable);
+
     }
 }

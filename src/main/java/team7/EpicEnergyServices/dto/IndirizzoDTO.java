@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import team7.EpicEnergyServices.Entities.Enums.TipoIndirizzo;
 
-import java.util.UUID;
-
 public record IndirizzoDTO(
 
 
@@ -27,7 +25,7 @@ public record IndirizzoDTO(
         String cap,
 
         @NotNull(message = "Il comune è obbligatorio!")
-        UUID comune,
+        String comune,
 
         @NotNull(message = "Il tipo di sede è obbligatorio")
         TipoIndirizzo sede

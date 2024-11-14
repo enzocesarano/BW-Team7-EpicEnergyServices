@@ -10,13 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Services.ComuneService;
 
 @RestController
-@RequestMapping("/importa-comuni")
+@RequestMapping("/comuni")
 public class ComuneController {
 
     @Autowired
     private ComuneService comuneService;
 
-    @PostMapping
+    @PostMapping("/importa-comuni")
     public ResponseEntity<String> importaComuni(@RequestParam("file") MultipartFile file) {
         try {
             comuneService.importaComuni(file);

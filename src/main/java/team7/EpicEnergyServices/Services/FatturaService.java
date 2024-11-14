@@ -66,7 +66,16 @@ public class FatturaService {
         Cliente cliente = (Cliente) cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
 
         Fattura newFattura = new Fattura(body.importo(), cliente);
-        return this.fR.save(newFattura);
+        this.fR.save(newFattura);
+
+        double sommaFattureAnnoCorrente = cliente.getFatture().stream()
+                .filter(fattura -> fattura.getDataFattura().getYear() == LocalDate.now().getYear())
+                .mapToDouble(Fattura::getImporto)
+                .sum();
+
+        cliente.setFatturatoAnnuale(sommaFattureAnnoCorrente + newFattura.getImporto());
+        this.cR.save(cliente);
+        return newFattura;
     }
 
     public Page<Fattura> findAll(int page, int size) {

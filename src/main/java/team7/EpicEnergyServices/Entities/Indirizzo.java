@@ -2,6 +2,7 @@ package team7.EpicEnergyServices.Entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @Table(name = "indirizzi")
+@JsonIgnoreProperties({"id_indirizzo"})
 public class Indirizzo {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

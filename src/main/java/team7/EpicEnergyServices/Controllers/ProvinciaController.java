@@ -10,13 +10,13 @@ import team7.EpicEnergyServices.Entities.Comune;
 import team7.EpicEnergyServices.Services.ProvinciaService;
 
 @RestController
-@RequestMapping("/importa-province")
+@RequestMapping("/province")
 public class ProvinciaController {
 
     @Autowired
     private ProvinciaService provinciaService;
 
-    @PostMapping
+    @PostMapping("/importa-province")
     public ResponseEntity<String> importaProvince(@RequestParam("file") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Il file è vuoto.");
@@ -30,7 +30,7 @@ public class ProvinciaController {
         }
     }
 
-    @GetMapping("/{nome}/comuni")
+    @GetMapping("/{nome}")
     @ResponseStatus(HttpStatus.OK)
     public Page<Comune> findAllByNome(
             @RequestParam(defaultValue = "0") int page,

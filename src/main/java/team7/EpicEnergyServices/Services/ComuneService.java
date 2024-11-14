@@ -88,4 +88,8 @@ public class ComuneService {
                 .orElseThrow(() -> new NotFoundException("Cliente con ID " + id_comune + " non trovato"));
     }
 
+    public Comune findByDenominazione(String denominazione) {
+        return comuneRepository.findByDenominazione(denominazione).orElseThrow(() -> new NotFoundException("Il comune non è stato trovato"));
+    }
+
 }

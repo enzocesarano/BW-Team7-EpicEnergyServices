@@ -24,7 +24,7 @@ public class IndirizzoService {
     private IndirizzoRepository indirizzoRepository;
 
     public Indirizzo createIndirizzo(IndirizzoDTO indirizzo) {
-        Comune comune = comuneRepository.findById(indirizzo.comune())
+        Comune comune = comuneRepository.findByDenominazione(indirizzo.comune())
                 .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + indirizzo.comune()));
 
         Indirizzo indirizzo1 = new Indirizzo(
@@ -56,8 +56,7 @@ public class IndirizzoService {
         indirizzo.setLocalita(dto.localita());
         indirizzo.setCap(dto.cap());
 
-        Comune comune = comuneRepository.findById(dto.comune())
-                .orElseThrow(() -> new RuntimeException("Comune non trovato con ID: " + dto.comune()));
+        Comune comune = comuneRepository.findByDenominazione(dto.comune()).orElseThrow(RuntimeException::new);
         indirizzo.setComune(comune);
 
         return indirizzoRepository.save(indirizzo);

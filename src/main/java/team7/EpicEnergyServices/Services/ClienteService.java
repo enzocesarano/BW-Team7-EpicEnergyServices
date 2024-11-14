@@ -94,7 +94,7 @@ public class ClienteService {
                     if (sede.comune() == null) {
                         throw new BadRequestException("Comune non fornito per la sede operativa");
                     }
-                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+                    Comune comuneOperativo = this.comuneService.findByDenominazione(sede.comune());
                     Indirizzo indirizzoOperativo = new Indirizzo(
                             sede.via(),
                             sede.civico(),
@@ -139,7 +139,7 @@ public class ClienteService {
                         throw new BadRequestException("Comune non fornito per la sede");
                     }
 
-                    Comune comuneOperativo = this.comuneService.findById(sede.comune());
+                    Comune comuneOperativo = this.comuneService.findByDenominazione(sede.comune());
 
                     Indirizzo indirizzo = new Indirizzo(
                             sede.via(),

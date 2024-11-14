@@ -20,6 +20,7 @@ import team7.EpicEnergyServices.dto.ClienteDTO;
 import team7.EpicEnergyServices.dto.StatoFatturaDTO;
 import team7.EpicEnergyServices.dto.UtenteDTO;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -106,12 +107,20 @@ public class UtenteController {
 
     @GetMapping("/me/clienti")
     @ResponseStatus(HttpStatus.OK)
-    public Page<Cliente> findAllByUser(
+    public Page<Cliente> getClientiByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "ragioneSociale") String sortBy,
-            @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
-        return clienteService.findAllByUtente(page, size, sortBy, currentAuthenticatedUtente);
+            @RequestParam(required = false) Double minFatturato,
+            @RequestParam(required = false) Double maxFatturato,
+            @RequestParam(required = false) LocalDate dataInserimento,
+            @RequestParam(required = false) LocalDate dataUltimoContatto,
+            @RequestParam(required = false) String parteRagioneSociale,
+            @RequestParam(required = false) String provinciaSedeLegale,
+            @AuthenticationPrincipal Utente currentAuthenticatedUser) {
+
+        return clienteService.getClienti(page, size, sortBy, minFatturato, maxFatturato,
+                dataInserimento, dataUltimoContatto, parteRagioneSociale, provinciaSedeLegale, currentAuthenticatedUser);
     }
 
     @PutMapping("/me/clienti/{id_cliente}")

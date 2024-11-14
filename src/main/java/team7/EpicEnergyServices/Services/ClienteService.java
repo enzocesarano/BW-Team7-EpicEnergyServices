@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Comune;
+import team7.EpicEnergyServices.Entities.Enums.TipoUtente;
 import team7.EpicEnergyServices.Entities.Indirizzo;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
@@ -51,11 +52,11 @@ public class ClienteService {
         return clienteRepository.findAll(pageable);
     }
 
-    public Page<Cliente> findAllByUtente(int page, int size, String sortBy, Utente currentAuthenticatedUtente) {
-        if (size > 15) size = 15;
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return clienteRepository.findAllByUtente(currentAuthenticatedUtente, pageable);
-    }
+//    public Page<Cliente> findAllByUtente(int page, int size, String sortBy, Utente currentAuthenticatedUtente) {
+//        if (size > 15) size = 15;
+//        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+//        return clienteRepository.findAllByUtente(currentAuthenticatedUtente, pageable);
+//    }
 
     public Cliente findById(UUID id_cliente) {
         return clienteRepository.findById(id_cliente)
@@ -181,10 +182,17 @@ public class ClienteService {
         return url;
     }
 
-    public Page<Cliente> getClienti(int page, int size, String sortBy, Double minFatturato, Double maxFatturato, LocalDate dataInserimento, LocalDate dataUltimoContatto, String parteRagioneSociale, String provinciaSedeLegale) {
+    public Page<Cliente> getClienti(int page, int size, String sortBy, Double minFatturato, Double maxFatturato, LocalDate dataInserimento, LocalDate dataUltimoContatto, String parteRagioneSociale, String provinciaSedeLegale, Utente currentAuthenticatedUser) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
         Specification<Cliente> spec = Specification.where(null);
+
+        if (currentAuthenticatedUser != null) {
+            if (currentAuthenticatedUser.getTipoUtente() != TipoUtente.ADMIN) {
+                spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("utente"), currentAuthenticatedUser));
+            }
+        }
 
         if (minFatturato != null) {
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("fatturatoAnnuale"), minFatturato));

@@ -12,13 +12,19 @@ import java.time.LocalDateTime;
 public class ExceptionsHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorsResponseDTO handleBadrequest(BadRequestException ex) {
+    public ErrorsResponseDTO handleBadRequest(BadRequestException ex) {
         return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorsResponseDTO handleNotFound(NotFoundException ex) {
+        return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorsResponseDTO handleUnauthorized(UnauthorizedException ex) {
         return new ErrorsResponseDTO(ex.getMessage(), LocalDateTime.now());
     }
 
@@ -29,3 +35,4 @@ public class ExceptionsHandler {
         return new ErrorsResponseDTO("Problema interno del server! Riprovare più tardi", LocalDateTime.now());
     }
 }
+

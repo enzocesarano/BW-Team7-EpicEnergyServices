@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import team7.EpicEnergyServices.Entities.Enums.TipoCliente;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +33,7 @@ public class Cliente {
     @Setter(AccessLevel.NONE)
     private LocalDate dataInserimento;
     private LocalDate dataUltimoContatto;
-    private BigDecimal fatturatoAnnuale;
+    private double fatturatoAnnuale;
     private String pec;
     private String telefono;
     private String emailContatto;
@@ -69,5 +68,6 @@ public class Cliente {
         this.telefonoContatto = telefonoContatto;
         this.sedi = sedi;
         this.dataInserimento = LocalDate.now();
+        this.fatturatoAnnuale = 0;
     }
 }

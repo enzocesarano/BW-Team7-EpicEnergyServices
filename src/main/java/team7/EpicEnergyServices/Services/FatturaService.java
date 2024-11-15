@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
+import team7.EpicEnergyServices.Entities.Enums.TipoUtente;
 import team7.EpicEnergyServices.Entities.Fattura;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.NotFoundException;
@@ -34,10 +35,17 @@ public class FatturaService {
     }
 
     public Page<Fattura> getFatture(int page, int size, String sortBy, int anno, LocalDate dataFattura,
-                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente) {
+                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente, Utente currentAuthenticatedUser) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
         Specification<Fattura> spec = Specification.where(null);
+
+        if (currentAuthenticatedUser != null) {
+            if (currentAuthenticatedUser.getTipoUtente() != TipoUtente.ADMIN) {
+                spec = spec.and((root, query, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("utente"), currentAuthenticatedUser));
+            }
+        }
 
         if (cliente != null) {
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("cliente"), cliente));

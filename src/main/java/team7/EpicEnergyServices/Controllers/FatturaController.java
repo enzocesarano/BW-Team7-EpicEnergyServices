@@ -26,6 +26,7 @@ public class FatturaController {
     private FatturaService fatturaService;
 
     @GetMapping("/me/fatture")
+    @ResponseStatus(HttpStatus.OK)
     public Page<Fattura> getFatture(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -35,9 +36,10 @@ public class FatturaController {
             @RequestParam(required = false) StatoFattura stato_fattura,
             @RequestParam(required = false) Double minImporto,
             @RequestParam(required = false) Double maxImporto,
-            @RequestParam(required = false) Cliente cliente) {
+            @RequestParam(required = false) Cliente cliente,
+            @AuthenticationPrincipal Utente currentAuthenticatedUser) {
 
-        return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente);
+        return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente,currentAuthenticatedUser);
     }
 
     @GetMapping("me/{fatturaId}")

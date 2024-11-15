@@ -31,7 +31,7 @@ public class FatturaController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "dataFattura") String sortBy,
-            @RequestParam(required = false) int anno,
+            @RequestParam(required = false) Integer anno,
             @RequestParam(required = false) LocalDate dataFattura,
             @RequestParam(required = false) StatoFattura stato_fattura,
             @RequestParam(required = false) Double minImporto,

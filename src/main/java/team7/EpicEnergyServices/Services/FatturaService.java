@@ -99,17 +99,28 @@ public class FatturaService {
 
     public Fattura findById(UUID fatturaId, Utente currentAuthenticatedUtente) {
         Fattura fattura = this.fR.findById(fatturaId).orElseThrow(() -> new NotFoundException("fattura non trovata"));
-        if (fattura.getCliente().getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
-            throw new UnauthorizedException("Non hai i permessi per vedere questa fattura!");
+
+        if (currentAuthenticatedUtente != null) {
+            if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
+                if (fattura.getCliente().getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
+                    throw new UnauthorizedException("Non hai i permessi per vedere questa fattura!");
+                }
+            }
         }
         return fattura;
     }
 
     public Fattura findByIdAndUpdateStato(UUID fatturaId, StatoFatturaDTO body, Utente currentAuthenticatedUtente) {
         Fattura found = this.findById(fatturaId, currentAuthenticatedUtente);
-        if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
-            throw new UnauthorizedException("Non hai i permessi per modificare questa fattura!");
+
+        if (currentAuthenticatedUtente != null) {
+            if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
+                if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
+                    throw new UnauthorizedException("Non hai i permessi per modificare questa fattura!");
+                }
+            }
         }
+
         found.setStatoFattura(body.stato_fattura());
         return this.fR.save(found);
     }
@@ -117,8 +128,12 @@ public class FatturaService {
 
     public void findByIdAndDelete(UUID fatturaId, Utente currentAuthenticatedUtente) {
         Fattura found = this.findById(fatturaId, currentAuthenticatedUtente);
-        if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
-            throw new UnauthorizedException("Non hai i permessi per eliminare questa fattura!");
+        if (currentAuthenticatedUtente != null) {
+            if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
+                if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
+                    throw new UnauthorizedException("Non hai i permessi per eliminare questa fattura!");
+                }
+            }
         }
         this.fR.delete(found);
     }

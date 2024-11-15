@@ -26,6 +26,7 @@ public class FatturaController {
     private FatturaService fatturaService;
 
     @GetMapping("/me/fatture")
+    @ResponseStatus(HttpStatus.OK)
     public Page<Fattura> getFatture(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -42,6 +43,7 @@ public class FatturaController {
     }
 
     @GetMapping("me/{fatturaId}")
+    @ResponseStatus(HttpStatus.OK)
     public Fattura findById(@PathVariable UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         return this.fatturaService.findById(fatturaId, currentAuthenticatedUtente);
     }
@@ -75,6 +77,7 @@ public class FatturaController {
     }
 
     @PutMapping("/me/{fatturaId}")
+    @ResponseStatus(HttpStatus.OK)
     public Fattura findByIdAndUpdate(@PathVariable UUID fatturaId,
                                      @RequestBody @Validated StatoFatturaDTO body,
                                      BindingResult validationResult,

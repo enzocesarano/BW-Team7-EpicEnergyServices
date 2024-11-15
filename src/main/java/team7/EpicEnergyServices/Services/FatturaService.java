@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
+import team7.EpicEnergyServices.Entities.Enums.TipoUtente;
 import team7.EpicEnergyServices.Entities.Fattura;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.NotFoundException;
@@ -34,10 +35,18 @@ public class FatturaService {
     }
 
     public Page<Fattura> getFatture(int page, int size, String sortBy, Integer anno, LocalDate dataFattura,
-                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente) {
+                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente, Utente currentAuthenticatedUtente) {
+
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
         Specification<Fattura> spec = Specification.where(null);
+
+        if (currentAuthenticatedUtente != null) {
+            if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
+                spec = spec.and((root, query, criteriaBuilder) ->
+                        criteriaBuilder.equal(root.get("cliente").get("utente").get("id_utente"), currentAuthenticatedUtente.getId_utente()));
+            }
+        }
 
         if (cliente != null) {
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("cliente"), cliente));
@@ -62,8 +71,12 @@ public class FatturaService {
         return fatturaRepository.findAll(spec, pageable);
     }
 
-    public Fattura save(FatturaDTO body, UUID cliente_Id) throws Throwable {
+    public Fattura save(FatturaDTO body, UUID cliente_Id, Utente currentAuthenticatedUtente) throws Throwable {
         Cliente cliente = (Cliente) cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
+
+        if (cliente.getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
+            throw new UnauthorizedException("Non hai i permessi per salvare questa fattura!");
+        }
 
         Fattura newFattura = new Fattura(body.importo(), cliente);
         this.fR.save(newFattura);
@@ -84,12 +97,16 @@ public class FatturaService {
         return this.fR.findAll(pageable);
     }
 
-    public Fattura findById(UUID fatturaId) {
-        return this.fR.findById(fatturaId).orElseThrow(() -> new NotFoundException("fattura non trovata"));
+    public Fattura findById(UUID fatturaId, Utente currentAuthenticatedUtente) {
+        Fattura fattura = this.fR.findById(fatturaId).orElseThrow(() -> new NotFoundException("fattura non trovata"));
+        if (fattura.getCliente().getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
+            throw new UnauthorizedException("Non hai i permessi per vedere questa fattura!");
+        }
+        return fattura;
     }
 
     public Fattura findByIdAndUpdateStato(UUID fatturaId, StatoFatturaDTO body, Utente currentAuthenticatedUtente) {
-        Fattura found = this.findById(fatturaId);
+        Fattura found = this.findById(fatturaId, currentAuthenticatedUtente);
         if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
             throw new UnauthorizedException("Non hai i permessi per modificare questa fattura!");
         }
@@ -98,8 +115,11 @@ public class FatturaService {
     }
 
 
-    public void findByIdAndDelete(UUID fatturaId) {
-        Fattura found = this.findById(fatturaId);
+    public void findByIdAndDelete(UUID fatturaId, Utente currentAuthenticatedUtente) {
+        Fattura found = this.findById(fatturaId, currentAuthenticatedUtente);
+        if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
+            throw new UnauthorizedException("Non hai i permessi per eliminare questa fattura!");
+        }
         this.fR.delete(found);
     }
 }

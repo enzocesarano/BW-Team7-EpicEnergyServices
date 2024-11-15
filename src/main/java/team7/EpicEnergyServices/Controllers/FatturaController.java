@@ -35,19 +35,20 @@ public class FatturaController {
             @RequestParam(required = false) StatoFattura stato_fattura,
             @RequestParam(required = false) Double minImporto,
             @RequestParam(required = false) Double maxImporto,
-            @RequestParam(required = false) Cliente cliente) {
+            @RequestParam(required = false) Cliente cliente,
+            @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
 
-        return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente);
+        return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente, currentAuthenticatedUtente);
     }
 
     @GetMapping("me/{fatturaId}")
-    public Fattura findById(@PathVariable UUID fatturaId) {
-        return this.fatturaService.findById(fatturaId);
+    public Fattura findById(@PathVariable UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+        return this.fatturaService.findById(fatturaId, currentAuthenticatedUtente);
     }
 
     @PostMapping("/me/clienti/{id_cliente}/fatture")
     @ResponseStatus(HttpStatus.CREATED)
-    public Fattura save(@RequestBody @Validated FatturaDTO body, @PathVariable UUID cliente_id, BindingResult validationResult) throws Throwable {
+    public Fattura save(@RequestBody @Validated FatturaDTO body, @PathVariable UUID cliente_id, BindingResult validationResult, @AuthenticationPrincipal Utente currentAuthenticatedUtente) throws Throwable {
 
         if (validationResult.hasErrors()) {
             String message = validationResult.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage())
@@ -55,7 +56,7 @@ public class FatturaController {
             throw new BadRequestException("Ci sono stati errori nel payload! " + message);
         }
 
-        return this.fatturaService.save(body, cliente_id);
+        return this.fatturaService.save(body, cliente_id, currentAuthenticatedUtente);
     }
 
 //    @PutMapping("/{fatturaId}")
@@ -69,8 +70,8 @@ public class FatturaController {
 
     @DeleteMapping("/me/{fatturaId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void findByIdAndDelete(@PathVariable UUID fatturaId) {
-        this.fatturaService.findByIdAndDelete(fatturaId);
+    public void findByIdAndDelete(@PathVariable UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+        this.fatturaService.findByIdAndDelete(fatturaId, currentAuthenticatedUtente);
     }
 
     @PutMapping("/me/{fatturaId}")

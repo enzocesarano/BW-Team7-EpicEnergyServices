@@ -7,7 +7,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import team7.EpicEnergyServices.Entities.Cliente;
 import team7.EpicEnergyServices.Entities.Enums.StatoFattura;
 import team7.EpicEnergyServices.Entities.Fattura;
 import team7.EpicEnergyServices.Entities.Utente;
@@ -36,7 +35,7 @@ public class FatturaController {
             @RequestParam(required = false) StatoFattura stato_fattura,
             @RequestParam(required = false) Double minImporto,
             @RequestParam(required = false) Double maxImporto,
-            @RequestParam(required = false) Cliente cliente,
+            @RequestParam(required = false) String cliente,
             @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
 
         return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente, currentAuthenticatedUtente);

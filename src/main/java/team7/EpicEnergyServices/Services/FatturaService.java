@@ -37,7 +37,7 @@ public class FatturaService {
     }
 
     public Page<Fattura> getFatture(int page, int size, String sortBy, Integer anno, LocalDate dataFattura,
-                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, Cliente cliente, Utente currentAuthenticatedUtente) {
+                                    StatoFattura statoFattura, Double minImporto, Double maxImporto, String cliente, Utente currentAuthenticatedUtente) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
@@ -51,7 +51,9 @@ public class FatturaService {
         }
 
         if (cliente != null) {
-            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("cliente"), cliente));
+            spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("cliente").get("ragioneSociale")),
+                    "%" + cliente.toLowerCase() + "%"));
         }
         if (statoFattura != null) {
             spec = spec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("statoFattura"), statoFattura));

@@ -35,7 +35,7 @@ public class UtenteController {
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Utente> findAll(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-                                @RequestParam(defaultValue = "id") String sortBy) {
+                                @RequestParam(defaultValue = "username") String sortBy) {
         return this.utenteService.findAll(page, size, sortBy);
     }
 

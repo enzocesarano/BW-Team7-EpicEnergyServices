@@ -169,9 +169,9 @@ public class ClienteService {
                 .orElseThrow(() -> new NotFoundException("Il cliente con email " + email + " non è stato trovato"));
     }
 
-    public String updateAvatar(MultipartFile file, UUID id_cliente, Utente currentAuthenticatedUtente) {
-        Cliente cliente = this.findById(id_cliente);
-        if (!cliente.getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
+    public String updateLogo(MultipartFile file, UUID cliente, Utente currentAuthenticatedUtente) {
+        Cliente cliente1 = this.findById(cliente);
+        if (!cliente1.getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
             throw new UnauthorizedException("Non hai i permessi per modificare questo cliente!");
         }
         String url = null;
@@ -180,8 +180,8 @@ public class ClienteService {
         } catch (IOException e) {
             throw new BadRequestException("Ci sono stati problemi con l'upload dell'avatar!");
         }
-        cliente.setLogoAziendale(url);
-        this.clienteRepository.save(cliente);
+        cliente1.setLogoAziendale(url);
+        this.clienteRepository.save(cliente1);
         return url;
     }
 

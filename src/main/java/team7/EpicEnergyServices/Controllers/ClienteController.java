@@ -28,7 +28,7 @@ public class ClienteController {
     @GetMapping("/clienti/{id_cliente}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
-    public Cliente findById(@PathVariable UUID id_cliente) {
+    public Cliente findById(@PathVariable("id_cliente") UUID id_cliente) {
         return clienteService.findById(id_cliente);
     }
 
@@ -36,14 +36,16 @@ public class ClienteController {
     @DeleteMapping("/clienti/{id_cliente}")
     @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCliente(@PathVariable UUID id_cliente) {
+    public void deleteCliente(@PathVariable("id_cliente") UUID id_cliente) {
         clienteService.deleteCliente(id_cliente);
     }
 
     @PatchMapping("/me/{id_cliente}/logo")
     @ResponseStatus(HttpStatus.OK)
-    public String uploadAvatar(@RequestParam("avatar") MultipartFile file, @PathVariable UUID id_dipendente, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
-        return this.clienteService.updateAvatar(file, id_dipendente, currentAuthenticatedUtente);
+    public String updateLogo(@PathVariable("id_cliente") UUID id_cliente,
+                             @RequestParam("logo") MultipartFile file,
+                             @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+        return this.clienteService.updateLogo(file, id_cliente, currentAuthenticatedUtente);
     }
 
     @PostMapping(value = "/me/clienti", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -79,7 +81,7 @@ public class ClienteController {
     @PutMapping("/me/clienti/{id_cliente}")
     @ResponseStatus(HttpStatus.OK)
     public Cliente updateCliente(
-            @PathVariable UUID id_cliente,
+            @PathVariable("id_cliente") UUID id_cliente,
             @RequestBody @Validated ClienteDTO payload,
             BindingResult validationResult,
             @AuthenticationPrincipal Utente currentAuthenticatedUtente) {

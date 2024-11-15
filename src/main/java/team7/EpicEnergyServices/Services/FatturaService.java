@@ -29,6 +29,8 @@ public class FatturaService {
     private FatturaRepository fR;
     @Autowired
     private ClienteRepository cR;
+    @Autowired
+    private ClienteService cS;
 
     public FatturaService(FatturaRepository fatturaRepository) {
         this.fatturaRepository = fatturaRepository;
@@ -71,19 +73,19 @@ public class FatturaService {
         return fatturaRepository.findAll(spec, pageable);
     }
 
-    public Fattura save(FatturaDTO body, UUID cliente_Id, Utente currentAuthenticatedUtente) throws Throwable {
-        Cliente cliente = (Cliente) cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
+    public Fattura save(FatturaDTO body, UUID cliente_Id, Utente currentAuthenticatedUtente) {
+        Cliente cliente = cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
 
         if (currentAuthenticatedUtente != null) {
             if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
-                if (cliente.getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
+                if (!cliente.getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
                     throw new UnauthorizedException("Non hai i permessi per salvare questa fattura!");
                 }
             }
         }
 
         Fattura newFattura = new Fattura(body.importo(), cliente);
-        this.fR.save(newFattura);
+
 
         double sommaFattureAnnoCorrente = cliente.getFatture().stream()
                 .filter(fattura -> fattura.getDataFattura().getYear() == LocalDate.now().getYear())
@@ -91,6 +93,7 @@ public class FatturaService {
                 .sum();
 
         cliente.setFatturatoAnnuale(sommaFattureAnnoCorrente + newFattura.getImporto());
+        this.fR.save(newFattura);
         this.cR.save(cliente);
         return newFattura;
     }
@@ -106,7 +109,7 @@ public class FatturaService {
 
         if (currentAuthenticatedUtente != null) {
             if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
-                if (fattura.getCliente().getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
+                if (!fattura.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
                     throw new UnauthorizedException("Non hai i permessi per vedere questa fattura!");
                 }
             }
@@ -132,6 +135,7 @@ public class FatturaService {
 
     public void findByIdAndDelete(UUID fatturaId, Utente currentAuthenticatedUtente) {
         Fattura found = this.findById(fatturaId, currentAuthenticatedUtente);
+        Cliente cliente = this.cS.findById(found.getCliente().getId_cliente());
         if (currentAuthenticatedUtente != null) {
             if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
                 if (!found.getCliente().getUtente().getId_utente().equals(currentAuthenticatedUtente.getId_utente())) {
@@ -139,6 +143,10 @@ public class FatturaService {
                 }
             }
         }
+
+
+        cliente.setFatturatoAnnuale(cliente.getFatturatoAnnuale() - found.getImporto());
+        this.cR.save(cliente);
         this.fR.delete(found);
     }
 }

@@ -65,6 +65,7 @@ public class UtenteService {
         userFound.setCognome(body.cognome());
         userFound.setEmail(body.email());
         userFound.setUsername(body.username());
+        userFound.setAvatar("https://ui-avatars.com/api/?name=" + body.nome() + "+" + body.cognome());
         return this.utenteRepository.save(userFound);
     }
 

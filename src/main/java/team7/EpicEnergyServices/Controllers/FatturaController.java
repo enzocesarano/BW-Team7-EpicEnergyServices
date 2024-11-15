@@ -42,15 +42,15 @@ public class FatturaController {
         return fatturaService.getFatture(page, size, sortBy, anno, dataFattura, stato_fattura, minImporto, maxImporto, cliente, currentAuthenticatedUtente);
     }
 
-    @GetMapping("me/{fatturaId}")
+    @GetMapping("me/{id_fattura}")
     @ResponseStatus(HttpStatus.OK)
-    public Fattura findById(@PathVariable UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+    public Fattura findById(@PathVariable("id_fattura") UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         return this.fatturaService.findById(fatturaId, currentAuthenticatedUtente);
     }
 
     @PostMapping("/me/clienti/{id_cliente}/fatture")
     @ResponseStatus(HttpStatus.CREATED)
-    public Fattura save(@RequestBody @Validated FatturaDTO body, @PathVariable UUID cliente_id, BindingResult validationResult, @AuthenticationPrincipal Utente currentAuthenticatedUtente) throws Throwable {
+    public Fattura save(@RequestBody @Validated FatturaDTO body, @PathVariable("id_cliente") UUID cliente_id, BindingResult validationResult, @AuthenticationPrincipal Utente currentAuthenticatedUtente) throws Throwable {
 
         if (validationResult.hasErrors()) {
             String message = validationResult.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage())
@@ -70,15 +70,15 @@ public class FatturaController {
 //        return this.fatturaService.findByIdAndUpdateStato(fatturaId, body);
 //    }
 
-    @DeleteMapping("/me/{fatturaId}")
+    @DeleteMapping("/me/{id_fattura}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void findByIdAndDelete(@PathVariable UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+    public void findByIdAndDelete(@PathVariable("id_fattura") UUID fatturaId, @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
         this.fatturaService.findByIdAndDelete(fatturaId, currentAuthenticatedUtente);
     }
 
-    @PutMapping("/me/{fatturaId}")
+    @PutMapping("/me/{id_fattura}")
     @ResponseStatus(HttpStatus.OK)
-    public Fattura findByIdAndUpdate(@PathVariable UUID fatturaId,
+    public Fattura findByIdAndUpdate(@PathVariable("id_fattura") UUID fatturaId,
                                      @RequestBody @Validated StatoFatturaDTO body,
                                      BindingResult validationResult,
                                      @AuthenticationPrincipal Utente currentAuthenticatedUtente) {

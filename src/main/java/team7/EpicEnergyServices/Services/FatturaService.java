@@ -74,8 +74,12 @@ public class FatturaService {
     public Fattura save(FatturaDTO body, UUID cliente_Id, Utente currentAuthenticatedUtente) throws Throwable {
         Cliente cliente = (Cliente) cR.findById(cliente_Id).orElseThrow(() -> new NotFoundException("Utente  non trovato"));
 
-        if (cliente.getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
-            throw new UnauthorizedException("Non hai i permessi per salvare questa fattura!");
+        if (currentAuthenticatedUtente != null) {
+            if (currentAuthenticatedUtente.getTipoUtente() != TipoUtente.ADMIN) {
+                if (cliente.getUtente().getId_utente() != currentAuthenticatedUtente.getId_utente()) {
+                    throw new UnauthorizedException("Non hai i permessi per salvare questa fattura!");
+                }
+            }
         }
 
         Fattura newFattura = new Fattura(body.importo(), cliente);

@@ -78,7 +78,7 @@ public class UtenteService {
         return this.utenteRepository.findByEmail(email).orElseThrow(() -> new NotFoundException("l'untente con la mail " + email + " non è stato trovato"));
     }
 
-    public Utente uploadAvatar(UUID utenteId, MultipartFile file) {
+    public String uploadAvatar(MultipartFile file, Utente currentAuthenticatedUtente) {
 
         if (file.isEmpty()) {
             throw new BadRequestException("Il file dell'immagine non può essere vuoto");
@@ -88,16 +88,17 @@ public class UtenteService {
         try {
             url = (String) cloudinaryUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap()).get("url");
         } catch (IOException e) {
-            throw new BadRequestException("errore nel caricamento dell'immagine");
+            throw new BadRequestException("Errore nel caricamento dell'immagine");
         }
 
-        Utente utenteFound = this.findById(utenteId);
+        Utente utenteFound = this.findById(currentAuthenticatedUtente.getId_utente());
         if (utenteFound == null) {
-            throw new BadRequestException("Dipendente non trovato con l'ID fornito");
+            throw new BadRequestException("Utente non trovato con l'ID fornito");
         }
 
         utenteFound.setAvatar(url);
-
-        return this.utenteRepository.save(utenteFound);
+        this.utenteRepository.save(utenteFound);
+        return url;
     }
+
 }

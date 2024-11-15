@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import team7.EpicEnergyServices.Entities.Utente;
 import team7.EpicEnergyServices.Exceptions.BadRequestException;
 import team7.EpicEnergyServices.Services.ClienteService;
@@ -86,4 +87,10 @@ public class UtenteController {
         this.utenteService.findByIdAndDelete(currentAuthenticatedUser.getId_utente());
     }
 
+    @PatchMapping("me/avatar")
+    @ResponseStatus(HttpStatus.OK)
+    public String updateAvatar(@RequestParam("avatar") MultipartFile file,
+                               @AuthenticationPrincipal Utente currentAuthenticatedUtente) {
+        return this.utenteService.uploadAvatar(file, currentAuthenticatedUtente);
+    }
 }
